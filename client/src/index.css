@@ -1,0 +1,298 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%; /* #FFFFFF */
+  --foreground: 20 14.3% 4.1%; /* #0C0A09 */
+  --muted: 60 4.8% 95.9%; /* #F8F8F8 */
+  --muted-foreground: 25 5.3% 44.7%; /* #666666 */
+  --popover: 0 0% 100%; /* #FFFFFF */
+  --popover-foreground: 20 14.3% 4.1%; /* #0C0A09 */
+  --card: 0 0% 100%; /* #FFFFFF */
+  --card-foreground: 20 14.3% 4.1%; /* #0C0A09 */
+  --border: 20 5.9% 90%; /* #E2E8F0 */
+  --input: 20 5.9% 90%; /* #E2E8F0 */
+  --primary: 152 58% 32%; /* #196f48 */
+  --primary-foreground: 0 0% 100%; /* #FFFFFF */
+  --secondary: 60 4.8% 95.9%; /* #F8F8F8 */
+  --secondary-foreground: 24 9.8% 10%; /* #1A1A1A */
+  --accent: 60 4.8% 95.9%; /* #F8F8F8 */
+  --accent-foreground: 24 9.8% 10%; /* #1A1A1A */
+  --destructive: 0 84.2% 60.2%; /* #CC0000 Gucci Red */
+  --destructive-foreground: 60 9.1% 97.8%; /* #FEFEFE */
+  --ring: 20 14.3% 4.1%; /* #0C0A09 */
+  --radius: 0.5rem;
+
+  /* Custom gradient colors */
+  --gucci-green-light: 152 58% 32%; /* #196f48 */
+  --gucci-green-dark: 152 71% 15%; /* #0b3f27 */
+  --gucci-red: 0 100% 40%; /* #CC0000 */
+  --luxury-gray: 60 4.8% 95.9%; /* #F8F8F8 */
+  --text-secondary: 25 5.3% 44.7%; /* #666666 */
+  --white: 0 0% 100%; /* #FFFFFF */
+}
+
+.dark {
+  --background: 240 10% 3.9%; /* #0A0A0B */
+  --foreground: 0 0% 98%; /* #FAFAFA */
+  --muted: 240 3.7% 15.9%; /* #262626 */
+  --muted-foreground: 240 5% 64.9%; /* #A1A1AA */
+  --popover: 240 10% 3.9%; /* #0A0A0B */
+  --popover-foreground: 0 0% 98%; /* #FAFAFA */
+  --card: 240 10% 3.9%; /* #0A0A0B */
+  --card-foreground: 0 0% 98%; /* #FAFAFA */
+  --border: 240 3.7% 15.9%; /* #262626 */
+  --input: 240 3.7% 15.9%; /* #262626 */
+  --primary: 152 76% 19%; /* #006341 */
+  --primary-foreground: 0 0% 98%; /* #FAFAFA */
+  --secondary: 240 3.7% 15.9%; /* #262626 */
+  --secondary-foreground: 0 0% 98%; /* #FAFAFA */
+  --accent: 240 3.7% 15.9%; /* #262626 */
+  --accent-foreground: 0 0% 98%; /* #FAFAFA */
+  --destructive: 0 62.8% 30.6%; /* #991B1B */
+  --destructive-foreground: 0 0% 98%; /* #FAFAFA */
+  --ring: 240 4.9% 83.9%; /* #D4D4D8 */
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Cormorant Garamond', 'Playfair Display', 'Times New Roman', serif;
+  }
+
+  /* Royal and vintage typography */
+  .royal-heading {
+    font-family: 'Cinzel', 'Playfair Display', serif;
+    @apply tracking-[0.15em] font-semibold;
+  }
+
+  .vintage-heading {
+    font-family: 'Playfair Display', serif;
+    @apply tracking-[0.1em] font-medium;
+  }
+
+  .elegant-body {
+    font-family: 'Cormorant Garamond', serif;
+    @apply tracking-[0.02em] leading-relaxed;
+  }
+
+  .luxury-text {
+    font-family: 'Playfair Display', serif;
+    @apply tracking-[0.05em];
+  }
+
+  /* Gucci luxury typography */
+  .gucci-heading {
+    font-family: 'Cinzel', serif;
+    @apply tracking-[0.2em] font-bold;
+  }
+
+  .gucci-body {
+    font-family: 'Cormorant Garamond', serif;
+    @apply tracking-[0.05em] font-semibold;
+  }
+
+  /* Make all text bolder */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+
+  p, span, div, button {
+    @apply font-semibold;
+  }
+
+  /* Smooth transitions for luxury feel */
+  .luxury-transition {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* Product card hover effects */
+  .product-card-hover {
+    @apply luxury-transition hover:shadow-lg;
+  }
+
+  /* Button styles matching Gucci's aesthetic */
+  .gucci-button {
+    @apply luxury-transition hover:opacity-80;
+  }
+}
+
+@layer components {
+  /* Cookie notice specific styles */
+  .cookie-notice {
+    @apply fixed top-0 left-0 right-0 bg-white border-b border-gray-200 p-4 z-50 shadow-sm;
+  }
+
+  /* Header styles */
+  .gucci-header {
+    @apply bg-white border-b border-gray-100 sticky top-0 z-50;
+  }
+
+  /* Product grid responsive styles */
+  .product-grid {
+    @apply grid grid-cols-2 md:grid-cols-4;
+  }
+
+  /* Mobile menu styles */
+  .mobile-menu {
+    @apply fixed inset-0 bg-white z-50 transform translate-x-full transition-transform duration-300;
+  }
+
+  .mobile-menu.open {
+    @apply translate-x-0;
+  }
+
+  /* Custom gradient styles */
+  .bg-gucci-gradient {
+    background: linear-gradient(135deg, #196f48 0%, #0b3f27 100%);
+    box-shadow: 0 10px 30px rgba(25, 111, 72, 0.3);
+  }
+
+  .bg-gucci-gradient-horizontal {
+    background: linear-gradient(90deg, #196f48 0%, #0b3f27 100%);
+  }
+
+  .bg-gucci-gradient-vertical {
+    background: linear-gradient(180deg, #196f48 0%, #0b3f27 100%);
+  }
+
+  .bg-royal-gradient {
+    background: linear-gradient(135deg, #196f48 0%, #0b3f27 50%, #1a5c3a 100%);
+    box-shadow: 0 15px 40px rgba(25, 111, 72, 0.4);
+  }
+
+  .bg-vintage-gradient {
+    background: linear-gradient(45deg, #0b3f27 0%, #196f48 30%, #2d8659 60%, #196f48 100%);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .text-gucci-gradient {
+    background: linear-gradient(135deg, #196f48 0%, #0b3f27 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-royal-gradient {
+    background: linear-gradient(135deg, #2d8659 0%, #196f48 50%, #0b3f27 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Royal styling elements */
+  .royal-border {
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #196f48 0%, #0b3f27 100%) 1;
+  }
+
+  .vintage-shadow {
+    box-shadow: 0 8px 25px rgba(25, 111, 72, 0.25), 0 4px 12px rgba(11, 63, 39, 0.15);
+  }
+
+  .royal-hover {
+    transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .royal-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(25, 111, 72, 0.3), 0 6px 18px rgba(11, 63, 39, 0.2);
+  }
+}
+
+/* Custom scrollbar for luxury feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--text-secondary));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--foreground));
+}
+
+.luxury-transition {
+    transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  /* Custom scrollbar for horizontal scroll */
+  .overflow-x-auto::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+  }
+
+  /* Drag to scroll styles */
+  .cursor-grab {
+    cursor: grab;
+  }
+
+  .cursor-grabbing {
+    cursor: grabbing;
+  }
+
+/* Drag to scroll functionality */
+.drag-scroll {
+  scroll-behavior: smooth;
+}
+
+.drag-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.drag-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Floating popup animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-top-5 {
+  from {
+    transform: translateY(-20px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fade-in 300ms ease-out, slide-in-from-top-5 300ms ease-out;
+}
