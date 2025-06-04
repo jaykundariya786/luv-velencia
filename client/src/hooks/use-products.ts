@@ -76,3 +76,17 @@ export function useSavedItems() {
     staleTime: 1 * 60 * 1000, // 1 minute
   });
 }
+
+export function useRecentlyViewed() {
+  return useQuery<Product[]>({
+    queryKey: ["/api/recently-viewed"],
+    queryFn: async () => {
+      const response = await fetch("/api/recently-viewed");
+      if (!response.ok) {
+        throw new Error('Failed to fetch recently viewed items');
+      }
+      return response.json();
+    },
+    staleTime: 30 * 1000, // 30 seconds (shorter cache for recently viewed)
+  });
+}

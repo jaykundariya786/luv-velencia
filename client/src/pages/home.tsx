@@ -13,7 +13,6 @@ export default function Home() {
     search: undefined as string | undefined,
   });
 
-  // Close overlays on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {

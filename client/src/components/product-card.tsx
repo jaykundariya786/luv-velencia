@@ -3,12 +3,23 @@ import { Heart } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "@/lib/queryClient";
-import { type Product } from "@shared/schema";
+// Define Product type locally to avoid import issues
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  category: string;
+  line?: string;
+  imageUrl: string;
+  altImageUrl?: string;
+  description?: string;
+  inStock?: boolean;
+}
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
-  product: Product;
+  product: any;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
@@ -78,16 +89,15 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div
-      className="cursor-pointer border border-white rounded-lg overflow-hidden relative bg-white"
+      className="cursor-pointer border border-gray-100 rounded-lg overflow-hidden relative bg-white lv-transition group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={handleCardClick}
     >
       <div className="relative overflow-hidden">
         <img
           src={product.imageUrl}
           alt={product.name}
-          className={`w-full h-full object-cover luxury-transition ${
+          className={`w-full h-full object-cover lv-transition group-hover:scale-105 ${
             isHovered && product.altImageUrl ? "opacity-0" : "opacity-100"
           }`}
         />
@@ -95,38 +105,31 @@ export default function ProductCard({ product }: ProductCardProps) {
           <img
             src={product.altImageUrl}
             alt={`${product.name} - Alternative View`}
-            className={`w-full h-full object-cover absolute top-0 left-0 luxury-transition ${
+            className={`w-full h-full object-cover absolute top-0 left-0 lv-transition group-hover:scale-105 ${
               isHovered ? "opacity-100" : "opacity-0"
             }`}
           />
         )}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="absolute top-2 right-2 bg-transparent hover:bg-transparent w-8 h-8 p-0"
+        <Heart
           onClick={handleSaveClick}
-          disabled={saveMutation.isPending}
-        >
-          <Heart
-            className={`w-8 h-8 ${
-              isSaved
-                ? "fill-primary text-primary "
-                : "text-gray-400 hover:text-primary"
-            } transition-colors`}
-          />
-        </Button>
+          className={`w-[22px] h-[22px] absolute top-4 right-4 bg-transparent hover:bg-transparent ${
+            isSaved
+              ? "fill-primary text-primary "
+              : "text-gray-400 hover:text-primary"
+          } transition-colors`}
+        />
       </div>
 
-      <div
-        className={`space-y-1 bg-white w-full p-4 border rounded-b-lg  border-black`}
-      >
-        <h3 className="text-sm font-normal text-black uppercase tracking-wide">
+      <div className="space-y-0.5 bg-white w-full px-4 py-2 border-t border-gray-100">
+        <h3 className="lv-body text-sm font-mono text-foreground tracking-wide line-clamp-1">
           {product.name}
         </h3>
-        <p className="text-sm text-black">{formatPrice(product.price)}</p>
+        <p className="lv-body text-primary lv-luxury font-bold text-black text-sm">
+          {formatPrice(product.price)}
+        </p>
         <a
           href={`/product/${product.id}`}
-          className="h-auto p-0 text-xs text-black hover:text-gray-600  font-normal"
+          className="lv-luxury text-xs text-foreground hover:text-primary lv-transition inline-block"
         >
           SHOP THIS
         </a>

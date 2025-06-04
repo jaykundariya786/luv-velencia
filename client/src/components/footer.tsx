@@ -1,18 +1,18 @@
 export default function Footer() {
   return (
-    <footer className="bg-gray-300  text-white py-16">
+    <footer className="bg-lv-brown text-lv-cream py-16 bg-primary">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Customer Care */}
-          <div>
-            <h3 className="font-medium mb-4 text-sm uppercase tracking-wider vintage-heading">
+          <div className="lv-fade-in delay-100">
+            <h3 className="lv-luxury mb-4 text-md font-bold text-black">
               Customer Care
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-3 text-sm">
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Contact Us
                 </a>
@@ -20,7 +20,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   My Account
                 </a>
@@ -28,7 +28,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Find a Store
                 </a>
@@ -36,7 +36,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Book an Appointment
                 </a>
@@ -44,7 +44,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   FAQ
                 </a>
@@ -52,7 +52,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Size Guide
                 </a>
@@ -61,15 +61,15 @@ export default function Footer() {
           </div>
 
           {/* Services */}
-          <div>
-            <h3 className="font-medium mb-4 text-sm uppercase tracking-wider vintage-heading">
+          <div className="lv-fade-in delay-200">
+            <h3 className="lv-luxury mb-4 text-md font-bold text-black">
               Services
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-3 text-sm">
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Shipping & Returns
                 </a>
@@ -77,7 +77,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Size Guide
                 </a>
@@ -85,7 +85,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Gift Services
                 </a>
@@ -93,7 +93,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Product Care
                 </a>
@@ -103,14 +103,14 @@ export default function Footer() {
 
           {/* About Gucci */}
           <div>
-            <h3 className="font-medium mb-4 text-sm uppercase tracking-wider vintage-heading">
+            <h3 className="lv-luxury mb-4 text-md font-bold text-black">
               About Gucci
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Corporate
                 </a>
@@ -118,7 +118,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Careers
                 </a>
@@ -126,7 +126,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Press
                 </a>
@@ -134,7 +134,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-sm text-gray-600 hover:text-gucci-gradient transition-colors elegant-body royal-hover"
+                  className="lv-body text-gray-500 hover:text-black font-mono lv-transition"
                 >
                   Sustainability
                 </a>
@@ -144,47 +144,38 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h3 className="font-medium mb-4 text-sm uppercase tracking-wider vintage-heading">
+            <h3 className="lv-luxury mb-4 text-md font-bold text-black">
               Newsletter
             </h3>
-            <p className="text-sm mb-4">
+            <p className="lv-body text-gray-500 hover:text-black font-mono lv-transition">
               Be the first to know about new arrivals and exclusive events.
             </p>
-            <div className="flex flex-col sm:flex-row gap-2">
-              {/* <input 
-                type="email" 
-                placeholder="Email Address" 
-                className="flex-1 bg-transparent border border-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-white"
-              />
-              <button className="bg-white text-black px-4 py-2 text-sm hover:bg-gray-200 transition-colors whitespace-nowrap">
-                Subscribe
-              </button> */}
-            </div>
+            <div className="flex flex-col sm:flex-row gap-2"></div>
           </div>
         </div>
 
         {/* Bottom Section */}
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-gray-400">
-              © 2024 Guccio Gucci S.p.A. - All rights reserved.
+            <div className="lv-luxury mb-4 text-xs font-bold text-black">
+              © 2025 LUV VENCENCIA - All rights reserved.
             </div>
             <div className="flex flex-wrap gap-4">
               <a
                 href="#"
-                className="text-sm text-gray-400 hover:text-white transition-colors"
+                className="text-sm text-gray-500 hover:text-white transition-colors"
               >
                 Privacy Policy
               </a>
               <a
                 href="#"
-                className="text-sm text-gray-400 hover:text-white transition-colors"
+                className="text-sm text-gray-500 hover:text-white transition-colors"
               >
                 Cookie Policy
               </a>
               <a
                 href="#"
-                className="text-sm text-gray-400 hover:text-white transition-colors"
+                className="text-sm text-gray-500 hover:text-white transition-colors"
               >
                 Terms of Use
               </a>

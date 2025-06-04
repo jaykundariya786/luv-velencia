@@ -5,7 +5,7 @@ export const data_materials = [
     content: (
       <div className="space-y-4 text-sm text-gray-600">
         <p>
-          Gucci products are made with carefully selected materials. Please
+          LUV VELENCIA products are made with carefully selected materials. Please
           handle with care for longer product life.
         </p>
         <ul className="space-y-2">

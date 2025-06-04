@@ -1,16 +1,25 @@
-
-import { useAuth } from '@/contexts/auth-context';
-import { Button } from '@/components/ui/button';
-import { useNavigate, Routes, Route } from 'react-router-dom';
-import { User, Settings, ShoppingBag, Heart, CreditCard, MapPin, Bell, Package, Calendar } from 'lucide-react';
+import { useAuth } from "@/contexts/auth-context";
+import { Button } from "@/components/ui/button";
+import { useNavigate, Routes, Route } from "react-router-dom";
+import {
+  User,
+  Settings,
+  ShoppingBag,
+  Heart,
+  CreditCard,
+  MapPin,
+  Bell,
+  Package,
+  Calendar,
+} from "lucide-react";
 
 // Import the new pages
-import Orders from './account/orders';
-import AccountSettings from './account/settings';
-import Addresses from './account/addresses';
-import Wallet from './account/wallet';
-import SavedItems from './account/saved-items';
-import Appointments from './account/appointments';
+import Orders from "./account/orders";
+import AccountSettings from "./account/settings";
+import Addresses from "./account/addresses";
+import Wallet from "./account/wallet";
+import SavedItems from "./account/saved-items";
+import Appointments from "./account/appointments";
 
 function AccountHome() {
   const { user, logout } = useAuth();
@@ -18,46 +27,46 @@ function AccountHome() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   const menuItems = [
     {
       icon: Package,
-      title: 'My Orders',
-      description: 'View your past orders and track shipments',
-      href: '/account/orders'
+      title: "My Orders",
+      description: "View your past orders and track shipments",
+      href: "/account/orders",
     },
     {
       icon: Settings,
-      title: 'Account Settings',
-      description: 'Privacy and security settings',
-      href: '/account/settings'
+      title: "Account Settings",
+      description: "Privacy and security settings",
+      href: "/account/settings",
     },
     {
       icon: MapPin,
-      title: 'Address Book',
-      description: 'Manage shipping and billing addresses',
-      href: '/account/addresses'
+      title: "Address Book",
+      description: "Manage shipping and billing addresses",
+      href: "/account/addresses",
     },
     {
       icon: CreditCard,
-      title: 'Wallet',
-      description: 'Manage your payment options',
-      href: '/account/wallet'
+      title: "Wallet",
+      description: "Manage your payment options",
+      href: "/account/wallet",
     },
     {
       icon: Heart,
-      title: 'Saved Items',
-      description: 'Items you want to keep track of',
-      href: '/account/saved-items'
+      title: "Saved Items",
+      description: "Items you want to keep track of",
+      href: "/account/saved-items",
     },
     {
       icon: Calendar,
-      title: 'My Appointments',
-      description: 'Book and manage store appointments',
-      href: '/account/appointments'
-    }
+      title: "My Appointments",
+      description: "Book and manage store appointments",
+      href: "/account/appointments",
+    },
   ];
 
   return (
@@ -70,13 +79,11 @@ function AccountHome() {
               <h1 className="text-2xl font-light uppercase tracking-wider text-black">
                 My Account
               </h1>
-              <p className="text-gray-600 mt-2">
-                Welcome back, {user?.name}
-              </p>
+              <p className="text-gray-600 mt-2">Welcome back, {user?.name}</p>
             </div>
             <div className="mt-4 md:mt-0 flex gap-4">
               <Button
-                onClick={() => navigate('/')}
+                onClick={() => navigate("/")}
                 variant="outline"
                 className="border-black text-black hover:bg-gray-50"
               >
@@ -105,7 +112,12 @@ function AccountHome() {
               <h2 className="text-lg font-medium text-black">{user?.name}</h2>
               <p className="text-gray-600">{user?.email}</p>
               <p className="text-sm text-gray-500 mt-1">
-                Signed in with {user?.provider === 'email' ? 'Email' : user?.provider === 'google' ? 'Google' : 'Apple'}
+                Signed in with{" "}
+                {user?.provider === "email"
+                  ? "Email"
+                  : user?.provider === "google"
+                  ? "Google"
+                  : "Apple"}
               </p>
             </div>
           </div>
@@ -138,17 +150,18 @@ function AccountHome() {
             Exclusive Member Benefits
           </h3>
           <p className="text-gray-300 mb-6">
-            Enjoy complimentary shipping, early access to new collections, and personalized styling services.
+            Enjoy complimentary shipping, early access to new collections, and
+            personalized styling services.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() => navigate('/shopping-bag')}
+              onClick={() => navigate("/shopping-bag")}
               className="bg-white text-black hover:bg-gray-100"
             >
               View Shopping Bag
             </Button>
             <Button
-              onClick={() => navigate('/')}
+              onClick={() => navigate("/")}
               variant="outline"
               className="border-white text-white hover:bg-white hover:text-black"
             >
@@ -166,7 +179,7 @@ export default function Account() {
   const navigate = useNavigate();
 
   if (!user) {
-    navigate('/sign-in');
+    navigate("/sign-in");
     return null;
   }
 

@@ -151,52 +151,54 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
 
   return (
     <div
-      className="sticky top-[73px] bg-white z-30 mx-auto px-8 py-4 sm:flex items-center sm:space-x-8"
+      className="sticky top-[67px] md:top-[72px] bg-white z-30 mx-auto px-8 py-4 sm:flex items-center sm:space-x-8"
       ref={dropdownRef}
     >
       <div className="relative">
         <button
           onClick={() => toggleDropdown("category")}
-          className="flex items-center text-sm font-medium text-black"
+          className="flex items-center text-xs font-medium text-black"
         >
-          <span>{getCategoryLabel()}</span>
+          <span className="lv-luxury text-xs font-bold text-black">
+            {getCategoryLabel()}
+          </span>
           <ChevronDown className="w-3 h-3 ml-1" />
         </button>
         {openDropdown === "category" && (
-          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60">
+          <div className="lv-body text-black rounded-3xl overflow-hidden  font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60">
             <button
               onClick={() => handleFilterChange("category", "all")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30 "
             >
               All (83)
             </button>
             <button
               onClick={() => handleFilterChange("category", "shoes")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Shoes (2)
             </button>
             <button
               onClick={() => handleFilterChange("category", "clothing")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Clothing (6)
             </button>
             <button
               onClick={() => handleFilterChange("category", "bags")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Bags (2)
             </button>
             <button
               onClick={() => handleFilterChange("category", "jewelry")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Jewelry (2)
             </button>
             <button
               onClick={() => handleFilterChange("category", "accessories")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Accessories (0)
             </button>
@@ -208,46 +210,48 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
       <div className="relative">
         <button
           onClick={() => toggleDropdown("line")}
-          className="flex items-center text-sm font-medium hover:text-black "
+          className="flex items-center text-xs font-medium hover:text-black"
         >
-          <span>{getLineLabel()}</span>
+          <span className="lv-luxury text-xs font-bold text-black">
+            {getLineLabel()}
+          </span>
           <ChevronDown className="w-3 h-3 ml-1" />
         </button>
         {openDropdown === "line" && (
-          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-48">
+          <div className="lv-body text-black rounded-3xl overflow-hidden  font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60">
             <button
               onClick={() => handleFilterChange("line", "all")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               All
             </button>
             <button
               onClick={() => handleFilterChange("line", "gucci-re-web")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Gucci Re-Web (1)
             </button>
             <button
               onClick={() => handleFilterChange("line", "gg-canvas")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               GG Canvas (2)
             </button>
             <button
               onClick={() => handleFilterChange("line", "staffa")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Staffa (2)
             </button>
             <button
               onClick={() => handleFilterChange("line", "ophidia")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Ophidia (1)
             </button>
             <button
               onClick={() => handleFilterChange("line", "chroma")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Chroma (1)
             </button>
@@ -259,17 +263,19 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
       <div className="relative">
         <button
           onClick={() => toggleDropdown("filters")}
-          className="flex items-center text-sm font-medium hover:text-black"
+          className="flex items-center text-xs font-medium hover:text-black"
         >
-          <span>FILTERS</span>
+          <span className="lv-luxury text-xs font-bold text-black">
+            FILTERS
+          </span>
           <ChevronDown className="w-3 h-3 ml-1" />
         </button>
         {openDropdown === "filters" && (
-          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 p-6">
+          <div className="lv-body text-black p-8 rounded-3xl overflow-hidden  font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60">
             <div className="grid grid-cols-2 gap-8">
               {/* Color Section */}
               <div>
-                <h4 className="text-sm font-medium mb-4 text-center">COLOR</h4>
+                <h4 className="text-xs font-medium mb-4 text-center">COLOR</h4>
                 <div className="space-y-3">
                   <label className="flex items-center">
                     <input
@@ -280,7 +286,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
                       }
                       className="mr-3 w-4 h-4"
                     />
-                    <span className="text-sm">All</span>
+                    <span className="text-xs">All</span>
                   </label>
                   {[
                     "Beige",
@@ -306,7 +312,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
                         }
                         className="mr-3 w-4 h-4"
                       />
-                      <span className="text-sm">{color}</span>
+                      <span className="text-xs">{color}</span>
                     </label>
                   ))}
                 </div>
@@ -314,7 +320,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
 
               {/* Material Section */}
               <div>
-                <h4 className="text-sm font-medium mb-4 text-center">
+                <h4 className="text-xs font-medium mb-4 text-center">
                   MATERIAL
                 </h4>
                 <div className="space-y-3">
@@ -327,7 +333,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
                       }
                       className="mr-3 w-4 h-4"
                     />
-                    <span className="text-sm">All</span>
+                    <span className="text-xs">All</span>
                   </label>
                   {[
                     "Fabric",
@@ -351,7 +357,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
                         }
                         className="mr-3 w-4 h-4"
                       />
-                      <span className="text-sm">{material}</span>
+                      <span className="text-xs">{material}</span>
                     </label>
                   ))}
                 </div>
@@ -365,13 +371,13 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={clearFilters}
-                  className="bg-black text-white px-6 py-2 text-sm font-medium hover:bg-gray-800"
+                  className="bg-black text-white px-6 py-2 text-xs font-medium hover:bg-gray-800"
                 >
                   CLEAR
                 </button>
                 <button
                   onClick={() => setOpenDropdown(null)}
-                  className="border border-gray-300 px-6 py-2 text-sm font-medium hover:bg-gray-50"
+                  className="border border-gray-300 px-6 py-2 text-xs font-medium hover:bg-primary/30"
                 >
                   CLOSE
                 </button>
@@ -385,29 +391,33 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
       <div className="relative">
         <button
           onClick={() => toggleDropdown("sort")}
-          className="flex items-center text-sm font-medium hover:text-black"
+          className="flex items-center text-xs font-medium hover:text-black"
         >
-          <span>SORT BY: </span>
-          <span className="ml-1">{getSortLabel()}</span>
+          <span className="lv-luxury text-xs font-bold text-black">
+            SORT BY :
+          </span>
+          <span className="ml-1 text-primary lv-luxury text-xs font-bold text-black">
+            {getSortLabel()}
+          </span>
           <ChevronDown className="w-3 h-3 ml-1" />
         </button>
         {openDropdown === "sort" && (
-          <div className="absolute top-full right-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-48">
+          <div className="lv-body text-black rounded-3xl overflow-hidden  font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60">
             <button
               onClick={() => handleFilterChange("sort", "newest")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Newest
             </button>
             <button
               onClick={() => handleFilterChange("sort", "price-high")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Price - High to Low
             </button>
             <button
               onClick={() => handleFilterChange("sort", "price-low")}
-              className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               Price - Low to High
             </button>

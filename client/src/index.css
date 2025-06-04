@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Futura:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,33 +9,34 @@
 
 :root {
   --background: 0 0% 100%; /* #FFFFFF */
-  --foreground: 20 14.3% 4.1%; /* #0C0A09 */
-  --muted: 60 4.8% 95.9%; /* #F8F8F8 */
-  --muted-foreground: 25 5.3% 44.7%; /* #666666 */
+  --foreground: 0 0% 9%; /* #171717 */
+  --muted: 210 40% 98%; /* #F8FAFC */
+  --muted-foreground: 215 13% 34%; /* #4A5568 */
   --popover: 0 0% 100%; /* #FFFFFF */
-  --popover-foreground: 20 14.3% 4.1%; /* #0C0A09 */
+  --popover-foreground: 0 0% 9%; /* #171717 */
   --card: 0 0% 100%; /* #FFFFFF */
-  --card-foreground: 20 14.3% 4.1%; /* #0C0A09 */
-  --border: 20 5.9% 90%; /* #E2E8F0 */
-  --input: 20 5.9% 90%; /* #E2E8F0 */
-  --primary: 152 58% 32%; /* #196f48 */
-  --primary-foreground: 0 0% 100%; /* #FFFFFF */
-  --secondary: 60 4.8% 95.9%; /* #F8F8F8 */
-  --secondary-foreground: 24 9.8% 10%; /* #1A1A1A */
-  --accent: 60 4.8% 95.9%; /* #F8F8F8 */
-  --accent-foreground: 24 9.8% 10%; /* #1A1A1A */
-  --destructive: 0 84.2% 60.2%; /* #CC0000 Gucci Red */
-  --destructive-foreground: 60 9.1% 97.8%; /* #FEFEFE */
-  --ring: 20 14.3% 4.1%; /* #0C0A09 */
-  --radius: 0.5rem;
+  --card-foreground: 0 0% 9%; /* #171717 */
+  --border: 214 32% 91%; /* #E2E8F0 */
+  --input: 214 32% 91%; /* #E2E8F0 */
+  --primary: 45 100% 51%; /* #FFD700 LUV VELENCIA Gold */
+  --primary-foreground: 0 0% 9%; /* #171717 */
+  --secondary: 210 40% 98%; /* #F8FAFC */
+  --secondary-foreground: 0 0% 9%; /* #171717 */
+  --accent: 210 40% 98%; /* #F8FAFC */
+  --accent-foreground: 0 0% 9%; /* #171717 */
+  --destructive: 0 84% 60%; /* #EF4444 */
+  --destructive-foreground: 0 0% 98%; /* #FAFAFA */
+  --ring: 45 100% 51%; /* #FFD700 */
+  --radius: 0.375rem;
 
-  /* Custom gradient colors */
-  --gucci-green-light: 152 58% 32%; /* #196f48 */
-  --gucci-green-dark: 152 71% 15%; /* #0b3f27 */
-  --gucci-red: 0 100% 40%; /* #CC0000 */
-  --luxury-gray: 60 4.8% 95.9%; /* #F8F8F8 */
-  --text-secondary: 25 5.3% 44.7%; /* #666666 */
-  --white: 0 0% 100%; /* #FFFFFF */
+  /* LUV VELENCIA inspired colors */
+  --lv-gold: 45 100% 51%; /* #FFD700 */
+  --lv-brown: 25 30% 15%; /* #2B1810 */
+  --lv-cream: 42 78% 95%; /* #FDF6E3 */
+  --lv-beige: 35 44% 85%; /* #E8D5B7 */
+  --lv-black: 0 0% 9%; /* #171717 */
+  --lv-gray: 215 13% 34%; /* #4A5568 */
+  --luxury-shadow: 0 0% 0%; /* #000000 */
 }
 
 .dark {
@@ -67,39 +68,35 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    font-family: 'Cormorant Garamond', 'Playfair Display', 'Times New Roman', serif;
+    font-family: 'Helvetica Neue', 'Arial', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
   }
 
-  /* Royal and vintage typography */
-  .royal-heading {
-    font-family: 'Cinzel', 'Playfair Display', serif;
-    @apply tracking-[0.15em] font-semibold;
+  /* LUV VELENCIA inspired typography */
+  .lv-heading {
+    font-family: 'Montserrat', 'Helvetica Neue', sans-serif;
+    @apply tracking-[0.1em] font-medium uppercase;
   }
 
-  .vintage-heading {
-    font-family: 'Playfair Display', serif;
-    @apply tracking-[0.1em] font-medium;
+  .lv-title {
+    font-family: 'Times New Roman', serif;
+    @apply tracking-[0.05em] font-normal;
   }
 
-  .elegant-body {
-    font-family: 'Cormorant Garamond', serif;
-    @apply tracking-[0.02em] leading-relaxed;
+  .lv-body {
+    font-family: 'Helvetica Neue', 'Arial', sans-serif;
+    @apply tracking-[0.01em] leading-relaxed font-light;
   }
 
-  .luxury-text {
-    font-family: 'Playfair Display', serif;
-    @apply tracking-[0.05em];
+  .lv-luxury {
+    font-family: 'Montserrat', sans-serif;
+    @apply tracking-[0.15em] font-semibold uppercase;
   }
 
-  /* Gucci luxury typography */
-  .gucci-heading {
-    font-family: 'Cinzel', serif;
-    @apply tracking-[0.2em] font-bold;
-  }
-
-  .gucci-body {
-    font-family: 'Cormorant Garamond', serif;
-    @apply tracking-[0.05em] font-semibold;
+  .lv-elegant {
+    font-family: 'Times New Roman', serif;
+    @apply tracking-[0.02em] font-normal;
   }
 
   /* Make all text bolder */
@@ -111,20 +108,109 @@
     @apply font-semibold;
   }
 
-  /* Smooth transitions for luxury feel */
-  .luxury-transition {
-    @apply transition-all duration-300 ease-in-out;
+  /* LUV VELENCIA inspired animations */
+  .lv-transition {
+    @apply transition-all duration-500 ease-out;
   }
 
-  /* Product card hover effects */
-  .product-card-hover {
-    @apply luxury-transition hover:shadow-lg;
+  .lv-hover {
+    @apply lv-transition hover:scale-105 hover:shadow-2xl;
   }
 
-  /* Button styles matching Gucci's aesthetic */
-  .gucci-button {
-    @apply luxury-transition hover:opacity-80;
+  .lv-fade-in {
+    animation: fadeInUp 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
   }
+
+  .lv-slide-in {
+    animation: slideInRight 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  .lv-bounce {
+    animation: bounceIn 0.8s ease-out forwards;
+  }
+
+  .lv-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .lv-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 215, 0, 0.2),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  /* Keyframe animations */
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+    20% {
+      transform: scale3d(1.1, 1.1, 1.1);
+    }
+    40% {
+      transform: scale3d(0.9, 0.9, 0.9);
+    }
+    60% {
+      opacity: 1;
+      transform: scale3d(1.03, 1.03, 1.03);
+    }
+    80% {
+      transform: scale3d(0.97, 0.97, 0.97);
+    }
+    to {
+      opacity: 1;
+      transform: scale3d(1, 1, 1);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Staggered animation delays */
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .delay-300 { animation-delay: 0.3s; }
+  .delay-400 { animation-delay: 0.4s; }
+  .delay-500 { animation-delay: 0.5s; }
 }
 
 @layer components {
@@ -134,14 +220,47 @@
   }
 
   /* Header styles */
-  .gucci-header {
-    @apply bg-white border-b border-gray-100 sticky top-0 z-50;
+  .lv-header {
+    @apply bg-white sticky top-0 z-40;
+    min-height: 60px;
+  }
+
+  @media (max-width: 768px) {
+    .lv-header {
+      min-height: 56px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .lv-header {
+      min-height: 52px;
+    }
   }
 
   /* Product grid responsive styles */
   .product-grid {
     @apply grid grid-cols-2 md:grid-cols-4;
   }
+
+  @media (max-width: 1024px) {
+    .product-grid {
+      @apply grid-cols-3;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .product-grid {
+      @apply grid-cols-2;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-grid {
+      @apply grid-cols-1;
+    }
+  }
+
+
 
   /* Mobile menu styles */
   .mobile-menu {
@@ -296,3 +415,30 @@
 .animate-in {
   animation: fade-in 300ms ease-out, slide-in-from-top-5 300ms ease-out;
 }
+
+/* Custom scrollbar styles */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom animations for category filters */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+  }

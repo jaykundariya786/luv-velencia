@@ -42,25 +42,25 @@ export default function ProductGrid({ filters }: ProductGridProps) {
       ) : (
         <>
           {products?.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-gray-600 text-lg">
+            <div className="text-center py-16 lv-fade-in">
+              <p className="text-gray-600 text-lg lv-body">
                 No products found matching your criteria.
               </p>
-              <p className="text-gray-500 text-sm mt-2">
+              <p className="text-gray-500 text-sm mt-2 lv-body">
                 Try adjusting your filters or search terms.
               </p>
             </div>
           )}
 
-          <div className="product-grid">
-            {products?.map((product) => (
-              <ProductCard key={product.id} product={product} />
+          <div className="product-grid gap-2">
+            {products?.map((product, index) => (
+              <ProductCard product={product} />
             ))}
           </div>
 
           {products && products.length > 0 && (
-            <div className="text-center mt-12">
-              <button className="bg-black text-white px-8 py-3 text-sm font-medium hover:bg-gray-800 transition-colors gucci-button">
+            <div className="text-center mt-12 lv-fade-in delay-300">
+              <button className="bg-primary text-primary-foreground px-8 py-3 lv-luxury rounded-full text-sm hover:bg-primary/90 lv-transition lv-hover">
                 LOAD MORE
               </button>
             </div>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { type Product } from "@shared/schema";
+import { useRecentlyViewed } from "@/hooks/use-products";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,7 @@ import { Heart, ChevronLeft, ChevronRight, Plus, Minus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ProductCard from "@/components/product-card";
 import { useShoppingBagContext } from "@/contexts/shopping-bag-context";
-import { data_materials } from "@/constant/jsonData";
+import SizeGuideModal from "@/components/size-guide-modal";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +34,7 @@ export default function ProductDetail() {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   // Get product data
   const { data: product, isLoading } = useQuery<Product>({
@@ -41,6 +43,19 @@ export default function ProductDetail() {
       const response = await fetch(`/api/products/${id}`);
       if (!response.ok) {
         throw new Error("Failed to fetch product");
+      }
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
+  // Get dynamic product details
+  const { data: productDetails, isLoading: isDetailsLoading } = useQuery({
+    queryKey: [`/api/products/${id}/details`],
+    queryFn: async () => {
+      const response = await fetch(`/api/products/${id}/details`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch product details");
       }
       return response.json();
     },
@@ -76,6 +91,11 @@ export default function ProductDetail() {
   });
 
   const isSaved = saveStatus?.isSaved || false;
+
+  // Get recently viewed items (excluding current product)
+  const { data: recentlyViewedData } = useRecentlyViewed();
+  const recentlyViewed =
+    recentlyViewedData?.filter((item) => item.id !== parseInt(id!)) || [];
 
   // Save/unsave item mutation
   const saveMutation = useMutation({
@@ -213,7 +233,7 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white">
       <div className=" bg-gray-50 h-[90vh] flex items-center justify-center w-full">
         <img
           src={images[currentImageIndex]}
@@ -241,30 +261,33 @@ export default function ProductDetail() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 bg-white">
         <div className="border-t border-gray-200 p-8 max-w-md mx-auto space-y-6">
-          <h3 className="font-normal text-sm uppercase tracking-wider">
+          <h3 className="lv-luxury mb-4 text-md font-bold text-black">
             PRODUCT DETAILS
           </h3>
 
           <div className="text-left space-y-2">
-            <h1 className="text-lg vintage-heading uppercase tracking-wider">
+            <h1 className="lv-body text-gray-700 hover:text-black font-mono lv-transition">
               {product.name}
             </h1>
-            <div className="text-lg luxury-text font-semibold">
+            <div className="text-lg luxury-text font-semibold text-primary">
               $ {parseFloat(product.price).toLocaleString()}
             </div>
           </div>
 
           {/* Size Selection */}
-          <div className="space-y-4">
+          <div className="space-y-4 uppercase tracking-[0.15em] text-xs font-bold text-black">
             <div className="flex items-center justify-between">
-              <span className="text-sm">Select Size</span>
-              <button className="text-xs underline text-gray-500 hover:text-black">
+              <span className="text-xs">Select Size</span>
+              <button
+                className="text-[9px] underline text-gray-500 hover:text-black"
+                onClick={() => setShowSizeGuide(true)}
+              >
                 VIEW SIZE GUIDE
               </button>
             </div>
 
             <Select value={selectedSize} onValueChange={setSelectedSize}>
-              <SelectTrigger className="w-full h-12 border-black">
+              <SelectTrigger className="w-full h-12 border-black uppercase text-xs">
                 <SelectValue placeholder="Select Size" />
               </SelectTrigger>
               <SelectContent>
@@ -275,54 +298,65 @@ export default function ProductDetail() {
                 ))}
               </SelectContent>
             </Select>
-
-            <Button
-              onClick={handleAddToBag}
-              className="w-full bg-gucci-gradient text-white h-12 uppercase tracking-wider transition-all text-sm vintage-heading"
-            >
-              ADD TO SHOPPING BAG
-            </Button>
           </div>
 
-          <div className="space-y-4 text-sm text-gray-600">
-            <p className="leading-relaxed">
-              The Re-Web sees Gucci's heritage stripes as a bold statement
-              detail on a contemporary silhouette. This pair is crafted from GG
-              denim with a leather trim. Defined by multiple iconic details,
-              this new sneaker takes center stage with the bold green and red
-              Web tongue.
-            </p>
-
-            <ul className="space-y-1">
-              <li>• Light blue GG denim</li>
-              <li>• Men's</li>
-              <li>• White leather trim</li>
-              <li>• Leather lining</li>
-              <li>• Gucci script and Interlocking G Web tag</li>
-              <li>
-                • Rubber outsole with Interlocking G and Gucci script logo
-              </li>
-              <li>• Interlocking G details on the eyelets</li>
-              <li>• Tongue with Web</li>
-              <li>• Additional pair of laces included</li>
-              <li>• Lace-up closure</li>
-              <li>• Low heel</li>
-              <li>• Height: 1.1"</li>
-              <li>• Made in Italy</li>
-              <li>• This style runs big, we recommend sizing down</li>
-            </ul>
+          <div className="lv-fade-in delay-300">
+            <a
+              onClick={handleAddToBag}
+              className="bg-primary px-8 py-3 lv-luxury rounded-full text-sm hover:bg-primary/90 lv-transition lv-hover"
+            >
+              ADD TO BAG
+            </a>
           </div>
         </div>
 
-        <div>
-          <div className="border-t border-gray-200">
-            {data_materials.map((section) => (
+        <div className="space-y-4 max-w-lg text-xs flex flex-col justify-center  text-black font-normal font-mono">
+          {productDetails && (
+            <>
+              <p className="leading-relaxed font-normal">
+                {productDetails.description}
+              </p>
+
+              <ul className="space-y-1 ">
+                {productDetails.specifications?.map(
+                  (spec: string, index: number) => (
+                    <li key={index}>• {spec}</li>
+                  )
+                )}
+              </ul>
+
+              {productDetails.sizeGuide && (
+                <div className="mt-4 p-3 max-w-md hover:shadow-lg transition-all duration-300 bg-gray-50 rounded-lg">
+                  <p className="mb-1 lv-luxury text-xs font-bold text-black">
+                    {productDetails.sizeGuide.fitType}
+                  </p>
+                  <p className="text-xs font-normal text-gray-600">
+                    {productDetails.sizeGuide.recommendation}
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+
+          {(isDetailsLoading || !productDetails) && (
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+              <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="border-t border-gray-200 ">
+        {productDetails?.materials
+          ? productDetails.materials.map((section: any) => (
               <div key={section.id} className="border-b border-gray-200">
                 <div
                   onClick={() => toggleSection(section.id)}
-                  className="w-full flex  items-center justify-between p-6 text-left hover:bg-gray-50"
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 cursor-pointer"
                 >
-                  <span className="text-sm font-normal uppercase tracking-wider">
+                  <span className="lv-luxury text-sm font-bold text-black">
                     {section.title}
                   </span>
                   {expandedSection === section.id ? (
@@ -332,25 +366,31 @@ export default function ProductDetail() {
                   )}
                 </div>
                 <div
-                  className={`overflow-hidden ${
+                  className={`overflow-hidden transition-all duration-300 flex-wrap font-mono ${
                     expandedSection === section.id
-                      ? "px-6 pb-6 transition-all duration-300"
-                      : "h-0 px-0 pb-0 transition-all duration-300"
+                      ? "px-6 pb-6 max-h-96 text-sm opacity-100"
+                      : "h-0 px-0 pb-0 text-[0] opacity-0"
                   }`}
                 >
-                  {section.content}
+                  <p className="leading-relaxed lv-body text-gray-700 hover:text-black font-mono lv-transition">
+                    {section.content}
+                  </p>
+                </div>
+              </div>
+            ))
+          : Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="border-b border-gray-200">
+                <div className="p-6">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/3"></div>
                 </div>
               </div>
             ))}
-          </div>
-        </div>
       </div>
 
-      {/* You May Also Like Section */}
       {relatedProducts && relatedProducts.length > 0 && (
-        <div className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-6">
-            <h2 className="text-center text-lg font-normal mb-12 uppercase tracking-wider">
+        <div className="bg-gray-100 py-8">
+          <div className="px-4 mx-auto">
+            <h2 className="text-center text-md mb-8 lv-luxury text-md font-bold text-black">
               YOU MAY ALSO LIKE
             </h2>
 
@@ -365,11 +405,11 @@ export default function ProductDetail() {
               onMouseMove={handleMouseMove}
               style={{ userSelect: "none" }}
             >
-              <div className="flex gap-6 min-w-max">
+              <div className="flex min-w-max gap-2">
                 {relatedProducts.map((relatedProduct) => (
                   <div
                     key={relatedProduct.id}
-                    className="w-64 flex-shrink-0 cursor-pointer"
+                    className="w-80 lex-shrink-0 cursor-pointer"
                     onClick={(e) => {
                       if (!isDragging) {
                         navigate(`/product/${relatedProduct.id}`);
@@ -386,24 +426,45 @@ export default function ProductDetail() {
         </div>
       )}
 
-      {/* Recently Viewed */}
-      <div className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-lg font-normal mb-8 uppercase tracking-wider">
-            RECENTLY VIEWED
-          </h2>
+      {recentlyViewed.length > 0 && (
+        <div className="py-8 bg-white">
+          <div className="mx-auto px-6">
+            <h2 className="mb-8 uppercase tracking-wider lv-luxury text-md font-bold text-black">
+              RECENTLY VIEWED ({recentlyViewed.length})
+            </h2>
 
-          <div className="flex gap-6">
-            <div className="w-32 h-32 bg-white">
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="w-full h-full object-contain p-2"
-              />
+            <div
+              className="overflow-x-auto cursor-grab"
+              style={{ userSelect: "none" }}
+            >
+              <div className="flex gap-2 min-w-max">
+                {recentlyViewed.slice(0, 5).map((recentProduct) => (
+                  <div
+                    key={recentProduct.id}
+                    className="w-56 lex-shrink-0 cursor-pointer"
+                    onClick={(e) => {
+                      if (!isDragging) {
+                        navigate(`/product/${recentProduct.id}`);
+                      }
+                    }}
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    <ProductCard product={recentProduct} />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
+
+      <SizeGuideModal
+        isOpen={showSizeGuide}
+        onClose={() => setShowSizeGuide(false)}
+        category={
+          product?.category?.toLowerCase().includes("women") ? "womens" : "mens"
+        }
+      />
     </div>
   );
 }

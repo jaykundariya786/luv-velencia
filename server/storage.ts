@@ -12,17 +12,21 @@ export interface IStorage {
   saveItem(sessionId: string, productId: number): Promise<SavedItem>;
   removeSavedItem(sessionId: string, productId: number): Promise<void>;
   isItemSaved(sessionId: string, productId: number): Promise<boolean>;
+  addRecentlyViewed(sessionId: string, productId: number): Promise<void>;
+  getRecentlyViewed(sessionId: string): Promise<Product[]>;
 }
 
 export class MemStorage implements IStorage {
   private products: Map<number, Product>;
   private savedItems: Map<string, SavedItem>;
+  private recentlyViewed: Map<string, number[]>;
   private currentProductId: number;
   private currentSavedId: number;
 
   constructor() {
     this.products = new Map();
     this.savedItems = new Map();
+    this.recentlyViewed = new Map();
     this.currentProductId = 1;
     this.currentSavedId = 1;
     this.seedData();
@@ -245,6 +249,37 @@ export class MemStorage implements IStorage {
 
   async getProductById(id: number) {
     return this.products.get(id);
+  }
+
+  async addRecentlyViewed(sessionId: string, productId: number): Promise<void> {
+    let viewedProducts = this.recentlyViewed.get(sessionId) || [];
+    
+    // Remove if already exists (to move to front)
+    viewedProducts = viewedProducts.filter(id => id !== productId);
+    
+    // Add to front
+    viewedProducts.unshift(productId);
+    
+    // Keep only last 10 items
+    if (viewedProducts.length > 10) {
+      viewedProducts = viewedProducts.slice(0, 10);
+    }
+    
+    this.recentlyViewed.set(sessionId, viewedProducts);
+  }
+
+  async getRecentlyViewed(sessionId: string): Promise<Product[]> {
+    const viewedProductIds = this.recentlyViewed.get(sessionId) || [];
+    const products: Product[] = [];
+    
+    for (const productId of viewedProductIds) {
+      const product = this.products.get(productId);
+      if (product) {
+        products.push(product);
+      }
+    }
+    
+    return products;
   }
 }
 
