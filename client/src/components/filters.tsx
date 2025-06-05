@@ -157,7 +157,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
       <div className="relative">
         <button
           onClick={() => toggleDropdown("category")}
-          className="flex items-center text-xs font-medium text-black"
+          className="flex items-center text-xs font-medium text-black transition-all duration-300 hover:scale-105 hover:text-primary"
         >
           <span className="lv-luxury text-xs font-bold text-black">
             {getCategoryLabel()}
@@ -165,10 +165,10 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
           <ChevronDown className="w-3 h-3 ml-1" />
         </button>
         {openDropdown === "category" && (
-          <div className="lv-body text-black rounded-3xl overflow-hidden  font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60">
+          <div className="lv-body text-black rounded-3xl overflow-hidden font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60 animate-fadeInUp opacity-0 transform translate-y-2">
             <button
               onClick={() => handleFilterChange("category", "all")}
-              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30 "
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30 transition-all duration-200 hover:translate-x-1"
             >
               All (83)
             </button>
@@ -210,7 +210,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
       <div className="relative">
         <button
           onClick={() => toggleDropdown("line")}
-          className="flex items-center text-xs font-medium hover:text-black"
+          className="flex items-center text-xs font-medium text-black transition-all duration-300 hover:scale-105 hover:text-primary"
         >
           <span className="lv-luxury text-xs font-bold text-black">
             {getLineLabel()}
@@ -218,7 +218,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
           <ChevronDown className="w-3 h-3 ml-1" />
         </button>
         {openDropdown === "line" && (
-          <div className="lv-body text-black rounded-3xl overflow-hidden  font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60">
+          <div className="lv-body text-black rounded-3xl overflow-hidden font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60 animate-fadeInUp opacity-0 transform translate-y-2">
             <button
               onClick={() => handleFilterChange("line", "all")}
               className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
@@ -263,7 +263,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
       <div className="relative">
         <button
           onClick={() => toggleDropdown("filters")}
-          className="flex items-center text-xs font-medium hover:text-black"
+          className="flex items-center text-xs font-medium text-black transition-all duration-300 hover:scale-105 hover:text-primary"
         >
           <span className="lv-luxury text-xs font-bold text-black">
             FILTERS
@@ -271,7 +271,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
           <ChevronDown className="w-3 h-3 ml-1" />
         </button>
         {openDropdown === "filters" && (
-          <div className="lv-body text-black p-8 rounded-3xl overflow-hidden  font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60">
+          <div className="lv-body text-black p-8 rounded-3xl overflow-hidden font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60 animate-fadeInUp opacity-0 transform translate-y-2">
             <div className="grid grid-cols-2 gap-8">
               {/* Color Section */}
               <div>
@@ -284,7 +284,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
                       onChange={(e) =>
                         handleColorChange("all", e.target.checked)
                       }
-                      className="mr-3 w-4 h-4"
+                      className="mr-3 w-4 h-4 accent-primary"
                     />
                     <span className="text-xs">All</span>
                   </label>
@@ -310,7 +310,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
                             e.target.checked
                           )
                         }
-                        className="mr-3 w-4 h-4"
+                        className="mr-3 w-4 h-4 accent-primary"
                       />
                       <span className="text-xs">{color}</span>
                     </label>
@@ -331,7 +331,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
                       onChange={(e) =>
                         handleMaterialChange("all", e.target.checked)
                       }
-                      className="mr-3 w-4 h-4"
+                      className="mr-3 w-4 h-4 accent-primary"
                     />
                     <span className="text-xs">All</span>
                   </label>
@@ -355,7 +355,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
                             e.target.checked
                           )
                         }
-                        className="mr-3 w-4 h-4"
+                        className="mr-3 w-4 h-4 accent-primary"
                       />
                       <span className="text-xs">{material}</span>
                     </label>
@@ -391,7 +391,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
       <div className="relative">
         <button
           onClick={() => toggleDropdown("sort")}
-          className="flex items-center text-xs font-medium hover:text-black"
+          className="flex items-center text-xs font-medium text-black transition-all duration-300 hover:scale-105 hover:text-primary"
         >
           <span className="lv-luxury text-xs font-bold text-black">
             SORT BY :
@@ -402,7 +402,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
           <ChevronDown className="w-3 h-3 ml-1" />
         </button>
         {openDropdown === "sort" && (
-          <div className="lv-body text-black rounded-3xl overflow-hidden  font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60">
+          <div className="lv-body text-black rounded-3xl overflow-hidden font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60 animate-fadeInUp opacity-0 transform translate-y-2">
             <button
               onClick={() => handleFilterChange("sort", "newest")}
               className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"

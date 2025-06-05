@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as React from "react";
 import {
   Search,
   ShoppingBag,
@@ -6,13 +7,22 @@ import {
   User,
   X,
   CircleUserRound,
+  Package,
+  Settings,
+  MapPin,
+  CreditCard,
+  Heart,
+  Calendar,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import ShoppingBagPopup from "./shopping-bag-popup";
-import { useShoppingBagContext } from "@/contexts/shopping-bag-context";
-import { useAuth } from "@/contexts/auth-context";
+import AccountModal from "./account-modal";
+import { useAppSelector, useAppDispatch } from "@/hooks/redux";
+import { RootState } from "@/store";
+import { logout } from "@/store/slices/authSlice";
 
 // MobileMenu Component
 interface MobileMenuProps {
@@ -28,6 +38,8 @@ interface SearchOverlayProps {
   onClose: () => void;
   onSearch: (searchTerm: string) => void;
 }
+
+
 
 // Main Header Component
 interface HeaderProps {
@@ -47,8 +59,12 @@ function MobileMenu({
   onShoppingBagOpen,
 }: MobileMenuProps) {
   const navigate = useNavigate();
-  const { getTotalItems } = useShoppingBagContext();
-  const { user } = useAuth();
+  const { items } = useAppSelector((state: RootState) => state.shoppingBag);
+  const { user } = useAppSelector((state: RootState) => state.auth);
+  
+  const getTotalItems = () => {
+    return items.reduce((total, item) => total + item.quantity, 0);
+  };
 
   const handleAccountClick = () => {
     if (user) {
@@ -71,7 +87,7 @@ function MobileMenu({
 
   return (
     <div
-      className={`mobile-menu flex flex-col h-full ${
+      className={`fixed right-0 top-0 w-full lg:w-1/3 h-full bg-white z-50 transform transition-transform duration-300 flex flex-col border-l shadow-lg ${
         isOpen ? "translate-x-0" : "translate-x-full"
       }`}
     >
@@ -103,7 +119,7 @@ function MobileMenu({
               href="/account"
               className="py-2 lv-body text-lg font-medium lv-transition hover:text-primary"
             >
-              <User className="h-5 w-5 hidden md:block" />{" "}
+              <User className="h-5 w-5" />
             </a>
           ) : (
             <a
@@ -111,7 +127,7 @@ function MobileMenu({
               href="/sign-in"
               className="py-2 lv-body text-lg font-medium lv-transition hover:text-primary"
             >
-              <User className="h-5 w-5 hidden md:block" />{" "}
+              <User className="h-5 w-5" />
             </a>
           )}
 
@@ -280,16 +296,16 @@ export default function Header({
 }: HeaderProps) {
   const navigate = useNavigate();
   const [isShoppingBagOpen, setIsShoppingBagOpen] = useState(false);
-  const { items, getTotalItems, updateQuantity, removeItem } =
-    useShoppingBagContext();
-  const { user } = useAuth();
+  const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+  const { items } = useAppSelector((state: RootState) => state.shoppingBag);
+  const { user } = useAppSelector((state: RootState) => state.auth);
+  
+  const getTotalItems = () => {
+    return items.reduce((total, item) => total + item.quantity, 0);
+  };
 
   const handleAccountClick = () => {
-    if (user) {
-      navigate("/account");
-    } else {
-      navigate("/sign-in");
-    }
+    setIsAccountModalOpen(true);
   };
 
   const handleSearch = (searchTerm: string) => {
@@ -314,15 +330,9 @@ export default function Header({
               className="h-4 w-4 sm:h-5 sm:w-5 hidden md:block"
             />
 
-            {user ? (
-              <a onClick={handleAccountClick} href="/account">
-                <User className="h-4 w-4 sm:h-5 sm:w-5 hidden md:block" />
-              </a>
-            ) : (
-              <a onClick={handleAccountClick} href="/sign-in">
-                <User className="h-4 w-4 sm:h-5 sm:w-5 hidden md:block" />
-              </a>
-            )}
+            <button onClick={handleAccountClick}>
+              <User className="h-4 w-4 sm:h-5 sm:w-5 hidden md:block" />
+            </button>
 
             <div
               onClick={() => setIsShoppingBagOpen(true)}
@@ -347,8 +357,6 @@ export default function Header({
         isOpen={isShoppingBagOpen}
         onClose={() => setIsShoppingBagOpen(false)}
         items={items}
-        onUpdateQuantity={updateQuantity}
-        onRemoveItem={removeItem}
       />
 
       <MobileMenu
@@ -362,6 +370,11 @@ export default function Header({
         isOpen={isSearchOpen}
         onClose={onSearchClose}
         onSearch={handleSearch}
+      />
+
+      <AccountModal
+        isOpen={isAccountModalOpen}
+        onClose={() => setIsAccountModalOpen(false)}
       />
     </header>
   );

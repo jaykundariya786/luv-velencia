@@ -1,4 +1,6 @@
-import { useAuth } from "@/contexts/auth-context";
+
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { logout } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Routes, Route } from "react-router-dom";
 import {
@@ -11,6 +13,8 @@ import {
   Bell,
   Package,
   Calendar,
+  ChevronRight,
+  LogOut,
 } from "lucide-react";
 
 // Import the new pages
@@ -22,152 +26,163 @@ import SavedItems from "./account/saved-items";
 import Appointments from "./account/appointments";
 
 function AccountHome() {
-  const { user, logout } = useAuth();
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout());
     navigate("/");
   };
 
   const menuItems = [
     {
       icon: Package,
-      title: "My Orders",
-      description: "View your past orders and track shipments",
-      href: "/account/orders",
-    },
-    {
-      icon: Settings,
-      title: "Account Settings",
-      description: "Privacy and security settings",
-      href: "/account/settings",
-    },
-    {
-      icon: MapPin,
-      title: "Address Book",
-      description: "Manage shipping and billing addresses",
-      href: "/account/addresses",
+      title: "TRACK YOUR ORDERS",
+      description: "Follow your orders every step of the way.",
+      path: "/account/orders",
     },
     {
       icon: CreditCard,
-      title: "Wallet",
-      description: "Manage your payment options",
-      href: "/account/wallet",
-    },
-    {
-      icon: Heart,
-      title: "Saved Items",
-      description: "Items you want to keep track of",
-      href: "/account/saved-items",
+      title: "STREAMLINE CHECKOUT",
+      description: "Check out faster with saved addresses and payment methods.",
+      path: "/account/wallet",
     },
     {
       icon: Calendar,
-      title: "My Appointments",
-      description: "Book and manage store appointments",
-      href: "/account/appointments",
+      title: "BOOK AN APPOINTMENT",
+      description: "Enjoy priority access to the boutique of your choice at the time and date that suits you.",
+      path: "/account/appointments",
+    },
+    {
+      icon: Settings,
+      title: "ACCOUNT SETTINGS",
+      description: "Manage your personal information and preferences",
+      path: "/account/settings",
+    },
+    {
+      icon: MapPin,
+      title: "ADDRESS BOOK",
+      description: "Manage your shipping and billing addresses",
+      path: "/account/addresses",
+    },
+    {
+      icon: Heart,
+      title: "SAVED ITEMS",
+      description: "View your wishlist and saved products",
+      path: "/account/saved-items",
     },
   ];
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-2xl font-light uppercase tracking-wider text-black">
-                My Account
-              </h1>
-              <p className="text-gray-600 mt-2">Welcome back, {user?.name}</p>
-            </div>
-            <div className="mt-4 md:mt-0 flex gap-4">
-              <Button
-                onClick={() => navigate("/")}
-                variant="outline"
-                className="border-black text-black hover:bg-gray-50"
-              >
-                Continue Shopping
-              </Button>
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                className="border-gray-300 text-gray-600 hover:bg-gray-50"
-              >
-                Sign Out
-              </Button>
-            </div>
-          </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl lv-luxury uppercase tracking-wider text-black mb-4">
+            MY LUV VELENCIA Account
+          </h1>
+          <p className="text-gray-600 text-lg">Welcome back, {user?.name}</p>
         </div>
-      </div>
 
-      {/* User Info Card */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-gray-50 rounded-lg p-6 mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center text-white text-lg font-medium">
-              {user?.name.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <h2 className="text-lg font-medium text-black">{user?.name}</h2>
-              <p className="text-gray-600">{user?.email}</p>
-              <p className="text-sm text-gray-500 mt-1">
-                Signed in with{" "}
-                {user?.provider === "email"
-                  ? "Email"
-                  : user?.provider === "google"
-                  ? "Google"
-                  : "Apple"}
+        {/* Profile Section */}
+        <div className="bg-gray-50 rounded-2xl p-8 mb-12 text-center">
+          <div className="w-24 h-24 bg-black rounded-full flex items-center justify-center mx-auto mb-6">
+            <User className="w-12 h-12 text-white" />
+          </div>
+          <h2 className="text-2xl font-medium text-black mb-2">{user?.name}</h2>
+          <p className="text-gray-600 mb-1">{user?.email}</p>
+          <p className="text-sm text-gray-500">Member since 2024</p>
+        </div>
+
+        {/* Main Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {menuItems.slice(0, 3).map((item, index) => (
+            <div
+              key={index}
+              onClick={() => navigate(item.path)}
+              className="group text-center p-8 border-2 border-gray-200 rounded-2xl hover:border-black transition-all duration-300 cursor-pointer hover:shadow-lg"
+            >
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-black group-hover:text-white transition-all duration-300">
+                <item.icon className="w-8 h-8" />
+              </div>
+              <h3 className="text-lg font-bold text-black mb-3 lv-luxury uppercase tracking-wider">
+                {item.title}
+              </h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {item.description}
               </p>
             </div>
-          </div>
+          ))}
         </div>
 
-        {/* Menu Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {menuItems.map((item) => (
-            <button
-              key={item.href}
-              onClick={() => navigate(item.href)}
-              className="text-left p-6 border border-gray-200 rounded-lg hover:border-black hover:shadow-md transition-all duration-200"
+        {/* Additional Options */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {menuItems.slice(3).map((item, index) => (
+            <div
+              key={index + 3}
+              onClick={() => navigate(item.path)}
+              className="group p-6 border border-gray-200 rounded-xl hover:border-black transition-colors cursor-pointer hover:shadow-md"
             >
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <item.icon className="w-5 h-5 text-gray-600" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <item.icon className="w-6 h-6 text-gray-600 group-hover:text-black transition-colors" />
+                  <div>
+                    <h3 className="font-medium text-black group-hover:text-black text-sm uppercase tracking-wider">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-gray-600 mt-1">
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium text-black mb-1">{item.title}</h3>
-                  <p className="text-sm text-gray-600">{item.description}</p>
-                </div>
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
               </div>
-            </button>
+            </div>
           ))}
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-12 bg-black text-white rounded-lg p-8 text-center">
-          <h3 className="text-xl font-light uppercase tracking-wider mb-4">
-            Exclusive Member Benefits
-          </h3>
-          <p className="text-gray-300 mb-6">
-            Enjoy complimentary shipping, early access to new collections, and
-            personalized styling services.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="bg-black rounded-2xl text-white p-8 text-center">
+          <h3 className="text-xl font-bold mb-6 lv-luxury uppercase tracking-wider">Quick Actions</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Button
-              onClick={() => navigate("/shopping-bag")}
-              className="bg-white text-black hover:bg-gray-100"
+              variant="secondary"
+              className="bg-white text-black hover:bg-gray-100 py-3 text-sm font-medium"
+              onClick={() => navigate("/products")}
             >
-              View Shopping Bag
+              <ShoppingBag className="w-4 h-4 mr-2" />
+              Continue Shopping
             </Button>
             <Button
-              onClick={() => navigate("/")}
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-black"
+              variant="secondary"
+              className="bg-white text-black hover:bg-gray-100 py-3 text-sm font-medium"
+              onClick={() => navigate("/account/orders")}
             >
-              Explore Collections
+              <Package className="w-4 h-4 mr-2" />
+              Track Order
+            </Button>
+            <Button
+              variant="secondary"
+              className="bg-white text-black hover:bg-gray-100 py-3 text-sm font-medium"
+              onClick={() => navigate("/account/appointments")}
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              Book Appointment
             </Button>
           </div>
+        </div>
+
+        {/* Sign Out */}
+        <div className="text-center mt-12">
+          <Button
+            onClick={handleLogout}
+            variant="outline"
+            className="border-black text-black hover:bg-black hover:text-white px-8 py-3"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
         </div>
       </div>
     </div>
@@ -175,7 +190,7 @@ function AccountHome() {
 }
 
 export default function Account() {
-  const { user } = useAuth();
+  const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
   if (!user) {

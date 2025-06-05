@@ -1,23 +1,21 @@
 import { X, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ShoppingBagItem } from "../hooks/use-shopping-bag";
+import { ShoppingBagItem, updateQuantity, removeItem } from "@/store/slices/shoppingBagSlice";
+import { useAppDispatch } from "@/hooks/redux";
 import { useNavigate } from "react-router-dom";
 
 interface ShoppingBagPopupProps {
   isOpen: boolean;
   onClose: () => void;
   items: ShoppingBagItem[];
-  onUpdateQuantity?: (id: number, size: string, quantity: number) => void;
-  onRemoveItem?: (id: number, size: string) => void;
 }
 
 export default function ShoppingBagPopup({
   isOpen,
   onClose,
   items,
-  onUpdateQuantity,
-  onRemoveItem,
 }: ShoppingBagPopupProps) {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   if (!isOpen) return null;
@@ -84,7 +82,7 @@ export default function ShoppingBagPopup({
                       {item.name}
                     </h3>
                     <button
-                      onClick={() => onRemoveItem?.(item.id, item.size)}
+                      onClick={() => dispatch(removeItem({ id: item.id, size: item.size }))}
                       className="text-gray-600 p-1"
                     >
                       <X className="w-4 h-4" />
@@ -106,11 +104,7 @@ export default function ShoppingBagPopup({
                     <div className="flex items-center border border-gray-300 rounded ">
                       <button
                         onClick={() =>
-                          onUpdateQuantity?.(
-                            item.id,
-                            item.size,
-                            item.quantity - 1
-                          )
+                          dispatch(updateQuantity({ id: item.id, size: item.size, quantity: item.quantity - 1 }))
                         }
                         className="p-1 hover:bg-gray-100 transition-colors"
                         disabled={item.quantity <= 1}
@@ -122,11 +116,7 @@ export default function ShoppingBagPopup({
                       </span>
                       <button
                         onClick={() =>
-                          onUpdateQuantity?.(
-                            item.id,
-                            item.size,
-                            item.quantity + 1
-                          )
+                          dispatch(updateQuantity({ id: item.id, size: item.size, quantity: item.quantity + 1 }))
                         }
                         className="p-1 hover:bg-gray-100 transition-colors"
                       >

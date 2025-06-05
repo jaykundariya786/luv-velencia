@@ -104,7 +104,7 @@ export default function Footer() {
           {/* About Gucci */}
           <div>
             <h3 className="lv-luxury mb-4 text-md font-bold text-black">
-              About Gucci
+              About LUV VENCENCIA
             </h3>
             <ul className="space-y-2 text-sm">
               <li>

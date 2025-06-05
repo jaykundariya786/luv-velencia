@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useProducts } from "@/hooks/use-products";
 import ProductCard from "@/components/product-card";
-import { Skeleton } from "@/components/ui/skeleton";
+import ProductSkeleton from "@/components/product-skeleton";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, X, SlidersHorizontal } from "lucide-react";
 
@@ -11,7 +10,7 @@ export default function SearchResults() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const searchQuery = searchParams.get("q") || "";
-  
+
   const [filters, setFilters] = useState({
     category: undefined as string | undefined,
     line: undefined as string | undefined,
@@ -88,6 +87,17 @@ export default function SearchResults() {
   const colors = ["Black", "White", "Brown", "Beige", "Blue", "Green", "Red", "Pink", "Grey", "Gold"];
   const materials = ["Leather", "GG Canvas", "Fabric", "Suede", "Canvas"];
 
+  if (isLoading && !products?.length) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-2 text-sm lv-body text-gray-500">Searching products...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
@@ -144,7 +154,7 @@ export default function SearchResults() {
               <SlidersHorizontal className="w-4 h-4" />
               FILTER
             </button>
-            
+
             {/* Sort Dropdown */}
             <div className="relative">
               <button
@@ -305,12 +315,7 @@ export default function SearchResults() {
             {isLoading ? (
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                 {Array.from({ length: 12 }).map((_, i) => (
-                  <div key={i} className="space-y-2 md:space-y-4">
-                    <Skeleton className="aspect-square w-full" />
-                    <Skeleton className="h-3 md:h-4 w-3/4" />
-                    <Skeleton className="h-3 md:h-4 w-1/2" />
-                    <Skeleton className="h-3 md:h-4 w-1/4" />
-                  </div>
+                  <ProductSkeleton key={i}/>
                 ))}
               </div>
             ) : (

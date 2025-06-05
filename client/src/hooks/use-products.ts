@@ -8,11 +8,16 @@ interface UseProductsFilters {
   search?: string;
   colors?: string[];
   materials?: string[];
+  limit?: number;
+  offset?: number;
 }
 
-export function useProducts(filters?: UseProductsFilters) {
+export function useProducts(
+  filters?: UseProductsFilters,
+  showAll: boolean = false
+) {
   const queryParams = new URLSearchParams();
-  
+
   if (filters?.category) {
     queryParams.append("category", filters.category);
   }
@@ -31,20 +36,26 @@ export function useProducts(filters?: UseProductsFilters) {
   if (filters?.materials && filters.materials.length > 0) {
     queryParams.append("materials", filters.materials.join(","));
   }
+  if (filters?.limit) {
+    queryParams.append("limit", filters.limit.toString());
+  }
+  if (filters?.offset) {
+    queryParams.append("offset", filters.offset.toString());
+  }
 
   const queryString = queryParams.toString();
   const url = `/api/products${queryString ? `?${queryString}` : ""}`;
 
-  return useQuery<Product[]>({
-    queryKey: [url],
+  return useQuery<{ products: Product[]; total: number }>({
+    queryKey: [url, showAll, filters],
     queryFn: async () => {
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error('Failed to fetch products');
+        throw new Error("Failed to fetch products");
       }
       return response.json();
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -54,12 +65,12 @@ export function useProduct(id: number) {
     queryFn: async () => {
       const response = await fetch(`/api/products/${id}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch product');
+        throw new Error("Failed to fetch product");
       }
       return response.json();
     },
     enabled: !!id,
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -69,11 +80,11 @@ export function useSavedItems() {
     queryFn: async () => {
       const response = await fetch("/api/saved-items");
       if (!response.ok) {
-        throw new Error('Failed to fetch saved items');
+        throw new Error("Failed to fetch saved items");
       }
       return response.json();
     },
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: 1 * 60 * 1000,
   });
 }
 
@@ -83,10 +94,10 @@ export function useRecentlyViewed() {
     queryFn: async () => {
       const response = await fetch("/api/recently-viewed");
       if (!response.ok) {
-        throw new Error('Failed to fetch recently viewed items');
+        throw new Error("Failed to fetch recently viewed items");
       }
       return response.json();
     },
-    staleTime: 30 * 1000, // 30 seconds (shorter cache for recently viewed)
+    staleTime: 30 * 1000,
   });
 }

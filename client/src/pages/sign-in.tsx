@@ -1,17 +1,18 @@
-
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/contexts/auth-context';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { login } from '@/store/slices/authSlice';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SignIn() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { login, loginWithGoogle, loginWithApple, isLoading } = useAuth();
-  
+  const dispatch = useAppDispatch();
+  const { isLoading } = useAppSelector((state) => state.auth);
+
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -23,35 +24,22 @@ export default function SignIn() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      if (isSignUp) {
-        // Mock signup functionality
-        const mockUser = {
-          id: Date.now().toString(),
-          email: formData.email,
-          name: formData.name,
-          provider: 'email' as const
-        };
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        toast({
-          title: "Account created successfully",
-          description: "Welcome to Gucci!"
-        });
-      } else {
-        // Mock login functionality
-        const mockUser = {
-          id: '1',
-          email: formData.email,
-          name: formData.email.split('@')[0],
-          provider: 'email' as const
-        };
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        toast({
-          title: "Signed in successfully",
-          description: "Welcome back!"
-        });
-      }
+      const mockUser = {
+        id: isSignUp ? Date.now().toString() : '1',
+        email: formData.email,
+        name: isSignUp ? formData.name : formData.email.split('@')[0],
+        provider: 'email' as const
+      };
+
+      dispatch(login(mockUser));
+
+      toast({
+        title: isSignUp ? "Account created successfully" : "Signed in successfully",
+        description: isSignUp ? "Welcome to LUV VELENCIA!" : "Welcome back!"
+      });
+
       navigate(from, { replace: true });
     } catch (error) {
       toast({
@@ -64,7 +52,15 @@ export default function SignIn() {
 
   const handleGoogleLogin = async () => {
     try {
-      await loginWithGoogle();
+      const mockUser = {
+        id: 'google_' + Date.now().toString(),
+        email: 'user@gmail.com',
+        name: 'Google User',
+        provider: 'google' as const
+      };
+
+      dispatch(login(mockUser));
+
       toast({
         title: "Signed in with Google",
         description: "Welcome!"
@@ -81,7 +77,15 @@ export default function SignIn() {
 
   const handleAppleLogin = async () => {
     try {
-      await loginWithApple();
+      const mockUser = {
+        id: 'apple_' + Date.now().toString(),
+        email: 'user@icloud.com',
+        name: 'Apple User',
+        provider: 'apple' as const
+      };
+
+      dispatch(login(mockUser));
+
       toast({
         title: "Signed in with Apple",
         description: "Welcome!"
@@ -175,7 +179,7 @@ export default function SignIn() {
                 required
               />
             )}
-            
+
             <Input
               type="email"
               placeholder="Email*"

@@ -111,7 +111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all products with optional filters
   app.get("/api/products", async (req, res) => {
     try {
-      const { category, line, sort, search, colors, materials } = req.query;
+      const { category, line, sort, search, colors, materials, limit, offset } = req.query;
 
       const filters: any = {};
 
@@ -148,8 +148,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         filters.materials = materials.split(",");
       }
 
-      const products = await storage.getProducts(filters);
-      res.json(products);
+      // Parse pagination parameters
+      const limitNum = limit ? parseInt(limit as string) : undefined;
+      const offsetNum = offset ? parseInt(offset as string) : 0;
+
+      const result = await storage.getProducts(filters, limitNum, offsetNum);
+      res.json(result);
     } catch (error) {
       console.error("Error fetching products:", error);
       res.status(500).json({ error: "Failed to fetch products" });

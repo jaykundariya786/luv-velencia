@@ -37,18 +37,18 @@ export const data_materials = [
     title: "PAYMENT OPTIONS",
     content: (
       <div className="space-y-2 text-sm text-gray-600">
-        <p>We accept all major credit cards, PayPal, and Gucci gift cards.</p>
+        <p>We accept all major credit cards, PayPal, and LUV VENCENCIA gift cards.</p>
         <p>Split payments available with qualifying payment methods.</p>
       </div>
     ),
   },
   {
     id: "packaging",
-    title: "GUCCI PACKAGING",
+    title: "LUV VENCENCIA PACKAGING",
     content: (
       <div className="text-sm text-gray-600">
         <p>
-          All items come in signature Gucci packaging including a flannel bag
+          All items come in signature LUV VENCENCIA packaging including a flannel bag
           and box.
         </p>
       </div>

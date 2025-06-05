@@ -6,7 +6,7 @@ export interface IStorage {
     line?: LineFilter;
     sort?: SortOption;
     search?: string;
-  }): Promise<Product[]>;
+  }, limit?: number, offset?: number): Promise<{ products: Product[], total: number }>;
   getProduct(id: number): Promise<Product | undefined>;
   getSavedItems(sessionId: string): Promise<Product[]>;
   saveItem(sessionId: string, productId: number): Promise<SavedItem>;
@@ -136,6 +136,165 @@ export class MemStorage implements IStorage {
         imageUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
         altImageUrl: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
         description: "Gucci Staffa long pendant necklace in silver"
+      },
+      {
+        name: "GG Canvas tote bag with leather trim",
+        price: "2980.00",
+        category: "bags",
+        line: "gg-canvas",
+        imageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Large GG Canvas tote bag with leather trim and handles"
+      },
+      {
+        name: "Men's Ace leather sneaker",
+        price: "790.00",
+        category: "shoes",
+        imageUrl: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Classic white leather sneaker with green and red web"
+      },
+      {
+        name: "Wool cashmere blend sweater",
+        price: "1850.00",
+        category: "clothing",
+        imageUrl: "https://images.unsplash.com/photo-1564557287817-3785e38ec1f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Premium wool cashmere blend sweater with ribbed details"
+      },
+      {
+        name: "Dionysus small shoulder bag",
+        price: "2350.00",
+        category: "bags",
+        line: "dionysus",
+        imageUrl: "https://images.unsplash.com/photo-1622560480654-d96214fdc887?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Small shoulder bag with tiger head closure"
+      },
+      {
+        name: "GG Marmont matelassé mini bag",
+        price: "1790.00",
+        category: "bags",
+        line: "gg-marmont",
+        imageUrl: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Mini matelassé shoulder bag with chain strap"
+      },
+      {
+        name: "Princetown leather slipper",
+        price: "890.00",
+        category: "shoes",
+        imageUrl: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Leather slipper with Horsebit detail"
+      },
+      {
+        name: "Cotton jersey polo with tiger",
+        price: "1250.00",
+        category: "clothing",
+        imageUrl: "https://images.unsplash.com/photo-1626497764746-6dc36546b388?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Cotton jersey polo with embroidered tiger detail"
+      },
+      {
+        name: "Interlocking G cufflinks",
+        price: "350.00",
+        category: "jewelry",
+        imageUrl: "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Silver-toned cufflinks with Interlocking G design"
+      },
+      {
+        name: "Linen silk blend shorts",
+        price: "950.00",
+        category: "clothing",
+        imageUrl: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Lightweight linen silk blend shorts for summer"
+      },
+      {
+        name: "Web stripe wool scarf",
+        price: "485.00",
+        category: "accessories",
+        imageUrl: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1582552938357-32b906df40cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Wool scarf with signature green and red web stripe"
+      },
+      {
+        name: "Jackie 1961 small hobo bag",
+        price: "3200.00",
+        category: "bags",
+        line: "jackie-1961",
+        imageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1622560480654-d96214fdc887?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Small hobo bag inspired by the Jackie collection"
+      },
+      {
+        name: "Rhyton leather sneaker",
+        price: "890.00",
+        category: "shoes",
+        imageUrl: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1549298916-b41d501d3772?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Chunky leather sneaker with vintage-inspired design"
+      },
+      {
+        name: "Silk twill shirt with print",
+        price: "1680.00",
+        category: "clothing",
+        imageUrl: "https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Silk twill shirt with artistic floral print"
+      },
+      {
+        name: "GG belt with double G buckle",
+        price: "450.00",
+        category: "accessories",
+        line: "gg-canvas",
+        imageUrl: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1582552938357-32b906df40cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "GG Supreme canvas belt with Double G buckle"
+      },
+      {
+        name: "Leather chain wallet",
+        price: "1250.00",
+        category: "accessories",
+        imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Leather chain wallet with multiple card slots"
+      },
+      {
+        name: "Bamboo 1947 small top handle bag",
+        price: "2890.00",
+        category: "bags",
+        line: "bamboo-1947",
+        imageUrl: "https://images.unsplash.com/photo-1622560480654-d96214fdc887?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Small top handle bag with bamboo detail"
+      },
+      {
+        name: "Reversible leather belt",
+        price: "520.00",
+        category: "accessories",
+        imageUrl: "https://images.unsplash.com/photo-1582552938357-32b906df40cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Reversible leather belt in black and brown"
+      },
+      {
+        name: "Tennis 1977 sneaker",
+        price: "850.00",
+        category: "shoes",
+        imageUrl: "https://images.unsplash.com/photo-1549298916-b41d501d3772?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Classic tennis sneaker with vintage-inspired design"
+      },
+      {
+        name: "Ophidia GG continental wallet",
+        price: "690.00",
+        category: "accessories",
+        line: "ophidia",
+        imageUrl: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        altImageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600",
+        description: "Continental wallet in GG Supreme canvas"
       }
     ];
 
@@ -152,7 +311,7 @@ export class MemStorage implements IStorage {
     search?: string;
     colors?: string[];
     materials?: string[];
-  }): Promise<Product[]> {
+  }, limit?: number, offset: number = 0): Promise<{ products: Product[]; total: number; }> {
     let productsArray = Array.from(this.products.values());
 
     // Apply filters
@@ -194,23 +353,30 @@ export class MemStorage implements IStorage {
     }
 
     // Apply sorting
-    if (filters?.sort) {
-      switch (filters.sort) {
-        case "price-low":
-          productsArray.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-          break;
-        case "price-high":
-          productsArray.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
-          break;
-        case "newest":
-        default:
-          // Default order (newest first)
-          productsArray.sort((a, b) => b.id - a.id);
-          break;
-      }
+    switch (filters?.sort) {
+      case "price-low-to-high":
+        productsArray.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+        break;
+      case "price-high-to-low":
+        productsArray.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+        break;
+      case "newest":
+        productsArray.sort((a, b) => b.id - a.id);
+        break;
+      default:
+        // Default to newest
+        productsArray.sort((a, b) => b.id - a.id);
+        break;
     }
 
-    return productsArray;
+    const total = productsArray.length;
+
+    // Apply pagination
+    if (limit !== undefined) {
+      productsArray = productsArray.slice(offset, offset + limit);
+    }
+
+    return { products: productsArray, total };
   }
 
   async getProduct(id: number): Promise<Product | undefined> {
@@ -253,32 +419,32 @@ export class MemStorage implements IStorage {
 
   async addRecentlyViewed(sessionId: string, productId: number): Promise<void> {
     let viewedProducts = this.recentlyViewed.get(sessionId) || [];
-    
+
     // Remove if already exists (to move to front)
     viewedProducts = viewedProducts.filter(id => id !== productId);
-    
+
     // Add to front
     viewedProducts.unshift(productId);
-    
+
     // Keep only last 10 items
     if (viewedProducts.length > 10) {
       viewedProducts = viewedProducts.slice(0, 10);
     }
-    
+
     this.recentlyViewed.set(sessionId, viewedProducts);
   }
 
   async getRecentlyViewed(sessionId: string): Promise<Product[]> {
     const viewedProductIds = this.recentlyViewed.get(sessionId) || [];
     const products: Product[] = [];
-    
+
     for (const productId of viewedProductIds) {
       const product = this.products.get(productId);
       if (product) {
         products.push(product);
       }
     }
-    
+
     return products;
   }
 }

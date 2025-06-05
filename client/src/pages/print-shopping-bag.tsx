@@ -1,11 +1,15 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useShoppingBagContext } from "../contexts/shopping-bag-context";
+import { useAppSelector } from "@/hooks/redux";
 import { Printer } from "lucide-react";
 
 export default function PrintShoppingBag() {
   const navigate = useNavigate();
-  const { items, getTotalPrice } = useShoppingBagContext();
+  const { items } = useAppSelector((state) => state.shoppingBag);
+  
+  const getTotalPrice = () => {
+    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
 
   useEffect(() => {
     // Auto-print when component loads

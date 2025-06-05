@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { useProducts } from "@/hooks/use-products";
 import ProductCard from "./product-card";
-import { Skeleton } from "@/components/ui/skeleton";
+import ProductSkeleton from "./product-skeleton";
 
 interface ProductGridProps {
   filters: {
@@ -14,7 +15,17 @@ interface ProductGridProps {
 }
 
 export default function ProductGrid({ filters }: ProductGridProps) {
-  const { data: products, isLoading, error } = useProducts(filters);
+  const [showAll, setShowAll] = useState(false);
+  const [initialLimit] = useState(12); // Show 12 products initially
+  
+  const productFilters = {
+    ...filters,
+    ...(showAll ? {} : { limit: initialLimit, offset: 0 })
+  };
+  
+  const { data, isLoading, error, refetch } = useProducts(productFilters);
+  const products = data?.products || [];
+  const total = data?.total || 0;
 
   if (error) {
     return (
@@ -29,16 +40,7 @@ export default function ProductGrid({ filters }: ProductGridProps) {
   return (
     <main className="mx-auto px-4 pb-12">
       {isLoading ? (
-        <div className="product-grid">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="space-y-4">
-              <Skeleton className="aspect-square w-full" />
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-              <Skeleton className="h-4 w-1/4" />
-            </div>
-          ))}
-        </div>
+        <ProductSkeleton count={12} />
       ) : (
         <>
           {products?.length === 0 && (
@@ -53,15 +55,22 @@ export default function ProductGrid({ filters }: ProductGridProps) {
           )}
 
           <div className="product-grid gap-2">
-            {products?.map((product, index) => (
-              <ProductCard product={product} />
+            {products?.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
-          {products && products.length > 0 && (
+          {products && products.length > 0 && !showAll && products.length < total && (
             <div className="text-center mt-12 lv-fade-in delay-300">
-              <button className="bg-primary text-primary-foreground px-8 py-3 lv-luxury rounded-full text-sm hover:bg-primary/90 lv-transition lv-hover">
-                LOAD MORE
+              <button 
+                onClick={() => {
+                  setShowAll(true);
+                  // Refetch all products without limit
+                  refetch();
+                }}
+                className="bg-primary text-primary-foreground px-8 py-3 lv-luxury rounded-full text-sm hover:bg-primary/90 lv-transition lv-hover"
+              >
+                LOAD ALL ({total - products.length} more)
               </button>
             </div>
           )}

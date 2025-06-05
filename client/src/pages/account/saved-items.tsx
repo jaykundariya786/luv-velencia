@@ -1,14 +1,15 @@
-
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, ShoppingBag, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { useShoppingBagContext } from '@/contexts/shopping-bag-context';
+import { useDispatch } from 'react-redux';
+import { addItem } from '@/store/slices/shoppingBagSlice';
 
 export default function SavedItems() {
   const navigate = useNavigate();
-  const { addItem } = useShoppingBagContext();
+  //const { addItem } = useShoppingBagContext();
+  const dispatch = useDispatch();
   const [savedItems, setSavedItems] = useState([
     {
       id: 1,
@@ -41,14 +42,13 @@ export default function SavedItems() {
   };
 
   const handleAddToBag = (item: any) => {
-    addItem({
+    dispatch(addItem({
       id: item.id,
       name: item.name,
       price: item.price,
       image: item.image,
-      style: `${item.id}FAEVU4645`,
       size: 'One Size',
-    });
+    }));
   };
 
   const handleViewProduct = (id: number) => {
@@ -91,7 +91,7 @@ export default function SavedItems() {
                       className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
-                  
+
                   {/* Remove Heart Icon */}
                   <Button
                     onClick={() => handleRemoveItem(item.id)}
@@ -101,7 +101,7 @@ export default function SavedItems() {
                   >
                     <Heart className="w-4 h-4 fill-red-500 text-red-500" />
                   </Button>
-                  
+
                   {/* Quick Actions */}
                   <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <Button

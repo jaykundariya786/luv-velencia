@@ -16,15 +16,17 @@ import {
 import { Heart, ChevronLeft, ChevronRight, Plus, Minus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ProductCard from "@/components/product-card";
-import { useShoppingBagContext } from "@/contexts/shopping-bag-context";
+import { useAppDispatch } from "@/hooks/redux";
+import { addItem } from "@/store/slices/shoppingBagSlice";
 import SizeGuideModal from "@/components/size-guide-modal";
+import ProductDetailSkeleton from "@/components/product-detail-skeleton";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { addItem } = useShoppingBagContext();
+  const dispatch = useAppDispatch();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -122,24 +124,80 @@ export default function ProductDetail() {
     },
   });
 
-  const sizes = [
-    { label: "5 = 5.5 US", value: "5" },
-    { label: "6 = 6.5 US", value: "6" },
-    { label: "6.5 = 7 US", value: "6.5" },
-    { label: "7 = 7.5 US", value: "7" },
-    { label: "7.5 = 8 US", value: "7.5" },
-    { label: "8 = 8.5 US", value: "8" },
-    { label: "8.5 = 9 US", value: "8.5" },
-    { label: "9 = 9.5 US", value: "9" },
-    { label: "9.5 = 10 US", value: "9.5" },
-    { label: "10 = 10.5 US", value: "10" },
-    { label: "10.5 = 11 US", value: "10.5" },
-    { label: "11 = 11.5 US", value: "11" },
-    { label: "12 = 12.5 US", value: "12" },
-    { label: "13 = 13.5 US", value: "13" },
-    { label: "14 = 14.5 US", value: "14" },
-    { label: "15 = 15.5 US", value: "15" },
-  ];
+  // Dynamic sizes based on product category
+  const getSizesForProduct = (category: string) => {
+    const lowerCategory = category?.toLowerCase() || '';
+    
+    if (lowerCategory.includes('shoes') || lowerCategory.includes('sneaker') || lowerCategory.includes('boot')) {
+      // Shoe sizes
+      return [
+        { label: "5 = 5.5 US", value: "5" },
+        { label: "6 = 6.5 US", value: "6" },
+        { label: "6.5 = 7 US", value: "6.5" },
+        { label: "7 = 7.5 US", value: "7" },
+        { label: "7.5 = 8 US", value: "7.5" },
+        { label: "8 = 8.5 US", value: "8" },
+        { label: "8.5 = 9 US", value: "8.5" },
+        { label: "9 = 9.5 US", value: "9" },
+        { label: "9.5 = 10 US", value: "9.5" },
+        { label: "10 = 10.5 US", value: "10" },
+        { label: "10.5 = 11 US", value: "10.5" },
+        { label: "11 = 11.5 US", value: "11" },
+        { label: "12 = 12.5 US", value: "12" },
+        { label: "13 = 13.5 US", value: "13" },
+        { label: "14 = 14.5 US", value: "14" },
+        { label: "15 = 15.5 US", value: "15" },
+      ];
+    } else if (lowerCategory.includes('shirt') || lowerCategory.includes('top') || lowerCategory.includes('jacket') || lowerCategory.includes('sweater')) {
+      // Clothing sizes
+      return [
+        { label: "XXS", value: "XXS" },
+        { label: "XS", value: "XS" },
+        { label: "S", value: "S" },
+        { label: "M", value: "M" },
+        { label: "L", value: "L" },
+        { label: "XL", value: "XL" },
+        { label: "XXL", value: "XXL" },
+        { label: "XXXL", value: "XXXL" },
+      ];
+    } else if (lowerCategory.includes('pant') || lowerCategory.includes('jean') || lowerCategory.includes('trouser')) {
+      // Pants sizes (waist sizes)
+      return [
+        { label: "28", value: "28" },
+        { label: "30", value: "30" },
+        { label: "32", value: "32" },
+        { label: "34", value: "34" },
+        { label: "36", value: "36" },
+        { label: "38", value: "38" },
+        { label: "40", value: "40" },
+        { label: "42", value: "42" },
+        { label: "44", value: "44" },
+        { label: "46", value: "46" },
+      ];
+    } else if (lowerCategory.includes('jewelry') || lowerCategory.includes('necklace') || lowerCategory.includes('ring')) {
+      // Jewelry sizes (for rings and adjustable items)
+      return [
+        { label: "One Size", value: "OS" },
+        { label: "Adjustable", value: "ADJ" },
+      ];
+    } else if (lowerCategory.includes('bag') || lowerCategory.includes('backpack') || lowerCategory.includes('purse')) {
+      // Bags typically come in one size
+      return [
+        { label: "One Size", value: "OS" },
+      ];
+    } else {
+      // Default sizes for other items
+      return [
+        { label: "One Size", value: "OS" },
+        { label: "S", value: "S" },
+        { label: "M", value: "M" },
+        { label: "L", value: "L" },
+        { label: "XL", value: "XL" },
+      ];
+    }
+  };
+
+  const sizes = getSizesForProduct(product?.category || '');
 
   const images = product
     ? [product.imageUrl, ...(product.altImageUrl ? [product.altImageUrl] : [])]
@@ -157,14 +215,15 @@ export default function ProductDetail() {
 
     if (!product) return;
 
-    addItem({
+    dispatch(addItem({
       id: product.id,
       name: product.name,
       price: parseFloat(product.price),
       image: product.imageUrl,
       style: `${product.id}FAEVU4645`,
       size: selectedSize,
-    });
+      quantity: 1,
+    }));
 
     toast({
       title: "Added to shopping bag",
@@ -177,11 +236,17 @@ export default function ProductDetail() {
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    setCurrentImageIndex((prev) => {
+      const nextIndex = (prev + 1) % images.length;
+      return nextIndex;
+    });
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentImageIndex((prev) => {
+      const prevIndex = (prev - 1 + images.length) % images.length;
+      return prevIndex;
+    });
   };
 
   const toggleSection = (section: string) => {
@@ -216,7 +281,7 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen bg-white">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">Loading...</div>
+          <ProductDetailSkeleton />
         </div>
       </div>
     );
@@ -234,60 +299,129 @@ export default function ProductDetail() {
 
   return (
     <div className="bg-white">
-      <div className=" bg-gray-50 h-[90vh] flex items-center justify-center w-full">
-        <img
-          src={images[currentImageIndex]}
-          alt={product.name}
-          className="w-full h-full object-contain"
-        />
+      <div className="relative bg-gray-50 h-[90vh] overflow-hidden">
+        <div 
+          className={`flex h-full ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} transition-transform duration-300 ease-out`}
+          style={{ 
+            transform: `translateX(-${currentImageIndex * 100}%)`,
+            userSelect: 'none'
+          }}
+          onMouseDown={(e) => {
+            setIsDragging(true);
+            setStartX(e.pageX);
+          }}
+          onMouseLeave={() => setIsDragging(false)}
+          onMouseUp={() => setIsDragging(false)}
+          onMouseMove={(e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX;
+            const walk = x - startX;
+            
+            if (Math.abs(walk) > 50) { // Threshold for scroll
+              if (walk > 0 && currentImageIndex > 0) {
+                prevImage();
+                setIsDragging(false);
+              } else if (walk < 0 && currentImageIndex < images.length - 1) {
+                nextImage();
+                setIsDragging(false);
+              }
+            }
+          }}
+        >
+          {images.map((image, index) => (
+            <div key={index} className="w-full h-full flex-shrink-0 flex items-center justify-center">
+              <img
+                src={image}
+                alt={`${product.name} - Image ${index + 1}`}
+                className="w-full h-full object-contain"
+                draggable={false}
+              />
+            </div>
+          ))}
+        </div>
 
         {images.length > 1 && (
           <>
             <button
-              onClick={prevImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDragging(false);
+                prevImage();
+              }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full transition-all duration-200 hover:scale-110 z-20 shadow-lg"
+              disabled={currentImageIndex === 0}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
-              onClick={nextImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDragging(false);
+                nextImage();
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full transition-all duration-200 hover:scale-110 z-20 shadow-lg"
+              disabled={currentImageIndex === images.length - 1}
             >
               <ChevronRight className="w-5 h-5" />
             </button>
+            
+            {/* Image indicators */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsDragging(false);
+                    setCurrentImageIndex(index);
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all duration-200 shadow-sm ${
+                    index === currentImageIndex 
+                      ? 'bg-white scale-125' 
+                      : 'bg-white/50 hover:bg-white/75'
+                  }`}
+                />
+              ))}
+            </div>
           </>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 bg-white">
-        <div className="border-t border-gray-200 p-8 max-w-md mx-auto space-y-6">
-          <h3 className="lv-luxury mb-4 text-md font-bold text-black">
-            PRODUCT DETAILS
-          </h3>
+        <div className="border-t border-gray-200 p-8 lg:p-12 max-w-lg mx-auto space-y-8">
+          <div className="space-y-2">
+            <h3 className="lv-luxury text-xs tracking-[0.2em] font-bold text-gray-500 uppercase">
+              PRODUCT DETAILS
+            </h3>
+            <div className="w-16 h-0.5 bg-primary"></div>
+          </div>
 
-          <div className="text-left space-y-2">
-            <h1 className="lv-body text-gray-700 hover:text-black font-mono lv-transition">
+          <div className="space-y-4">
+            <h1 className="lv-title text-2xl lg:text-3xl font-light text-black leading-tight">
               {product.name}
             </h1>
-            <div className="text-lg luxury-text font-semibold text-primary">
-              $ {parseFloat(product.price).toLocaleString()}
+            <div className="text-xl font-bold text-black">
+              ${parseFloat(product.price).toLocaleString()}
             </div>
           </div>
 
           {/* Size Selection */}
-          <div className="space-y-4 uppercase tracking-[0.15em] text-xs font-bold text-black">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs">Select Size</span>
+              <span className="lv-luxury text-xs tracking-[0.15em] font-bold text-black uppercase">
+                Select Size
+              </span>
               <button
-                className="text-[9px] underline text-gray-500 hover:text-black"
+                className="text-xs underline text-gray-600 hover:text-black lv-transition"
                 onClick={() => setShowSizeGuide(true)}
               >
-                VIEW SIZE GUIDE
+                SIZE GUIDE
               </button>
             </div>
 
             <Select value={selectedSize} onValueChange={setSelectedSize}>
-              <SelectTrigger className="w-full h-12 border-black uppercase text-xs">
+              <SelectTrigger className="w-full h-14 border-2 border-gray-300 hover:border-black lv-transition uppercase text-sm font-medium">
                 <SelectValue placeholder="Select Size" />
               </SelectTrigger>
               <SelectContent>
@@ -300,37 +434,64 @@ export default function ProductDetail() {
             </Select>
           </div>
 
-          <div className="lv-fade-in delay-300">
-            <a
+          <div className="pt-4">
+            <Button
               onClick={handleAddToBag}
-              className="bg-primary px-8 py-3 lv-luxury rounded-full text-sm hover:bg-primary/90 lv-transition lv-hover"
+              className="w-full h-14 bg-black text-white hover:bg-gray-800 lv-luxury text-sm tracking-[0.1em] font-semibold uppercase lv-transition"
             >
               ADD TO BAG
-            </a>
+            </Button>
+          </div>
+
+          <div className="pt-4 border-t border-gray-100">
+            <button
+              onClick={handleSaveClick}
+              className="flex items-center gap-2 text-sm text-gray-600 hover:text-black lv-transition"
+            >
+              <Heart
+                className={`w-4 h-4 ${
+                  isSaved ? "fill-current text-red-500" : ""
+                }`}
+              />
+              {isSaved ? "SAVED" : "SAVE ITEM"}
+            </button>
           </div>
         </div>
 
-        <div className="space-y-4 max-w-lg text-xs flex flex-col justify-center  text-black font-normal font-mono">
+        <div className="space-y-8 max-w-lg flex flex-col justify-center p-8 lg:p-12">
           {productDetails && (
             <>
-              <p className="leading-relaxed font-normal">
-                {productDetails.description}
-              </p>
+              <div className="space-y-4">
+                <h4 className="lv-luxury text-xs tracking-[0.2em] font-bold text-gray-500 uppercase">
+                  DESCRIPTION
+                </h4>
+                <p className="lv-body text-sm leading-relaxed text-gray-700 font-light">
+                  {productDetails.description}
+                </p>
+              </div>
 
-              <ul className="space-y-1 ">
-                {productDetails.specifications?.map(
-                  (spec: string, index: number) => (
-                    <li key={index}>• {spec}</li>
-                  )
-                )}
-              </ul>
+              <div className="space-y-4">
+                <h4 className="lv-luxury text-xs tracking-[0.2em] font-bold text-gray-500 uppercase">
+                  FEATURES
+                </h4>
+                <ul className="space-y-2">
+                  {productDetails.specifications?.map(
+                    (spec: string, index: number) => (
+                      <li key={index} className="lv-body text-sm text-gray-700 font-light flex items-start">
+                        <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        {spec}
+                      </li>
+                    )
+                  )}
+                </ul>
+              </div>
 
               {productDetails.sizeGuide && (
-                <div className="mt-4 p-3 max-w-md hover:shadow-lg transition-all duration-300 bg-gray-50 rounded-lg">
-                  <p className="mb-1 lv-luxury text-xs font-bold text-black">
+                <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+                  <h5 className="lv-luxury text-xs font-bold text-black uppercase mb-2">
                     {productDetails.sizeGuide.fitType}
-                  </p>
-                  <p className="text-xs font-normal text-gray-600">
+                  </h5>
+                  <p className="lv-body text-sm text-gray-600 font-light">
                     {productDetails.sizeGuide.recommendation}
                   </p>
                 </div>
@@ -339,10 +500,18 @@ export default function ProductDetail() {
           )}
 
           {(isDetailsLoading || !productDetails) && (
-            <div className="space-y-2">
-              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-20"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+              </div>
+              <div className="space-y-3">
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-4/5"></div>
+              </div>
             </div>
           )}
         </div>
