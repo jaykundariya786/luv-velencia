@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -29,8 +29,6 @@ export default function ProductDetail() {
   const dispatch = useAppDispatch();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string>("");
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -126,9 +124,13 @@ export default function ProductDetail() {
 
   // Dynamic sizes based on product category
   const getSizesForProduct = (category: string) => {
-    const lowerCategory = category?.toLowerCase() || '';
-    
-    if (lowerCategory.includes('shoes') || lowerCategory.includes('sneaker') || lowerCategory.includes('boot')) {
+    const lowerCategory = category?.toLowerCase() || "";
+
+    if (
+      lowerCategory.includes("shoes") ||
+      lowerCategory.includes("sneaker") ||
+      lowerCategory.includes("boot")
+    ) {
       // Shoe sizes
       return [
         { label: "5 = 5.5 US", value: "5" },
@@ -148,7 +150,12 @@ export default function ProductDetail() {
         { label: "14 = 14.5 US", value: "14" },
         { label: "15 = 15.5 US", value: "15" },
       ];
-    } else if (lowerCategory.includes('shirt') || lowerCategory.includes('top') || lowerCategory.includes('jacket') || lowerCategory.includes('sweater')) {
+    } else if (
+      lowerCategory.includes("shirt") ||
+      lowerCategory.includes("top") ||
+      lowerCategory.includes("jacket") ||
+      lowerCategory.includes("sweater")
+    ) {
       // Clothing sizes
       return [
         { label: "XXS", value: "XXS" },
@@ -160,7 +167,11 @@ export default function ProductDetail() {
         { label: "XXL", value: "XXL" },
         { label: "XXXL", value: "XXXL" },
       ];
-    } else if (lowerCategory.includes('pant') || lowerCategory.includes('jean') || lowerCategory.includes('trouser')) {
+    } else if (
+      lowerCategory.includes("pant") ||
+      lowerCategory.includes("jean") ||
+      lowerCategory.includes("trouser")
+    ) {
       // Pants sizes (waist sizes)
       return [
         { label: "28", value: "28" },
@@ -174,17 +185,23 @@ export default function ProductDetail() {
         { label: "44", value: "44" },
         { label: "46", value: "46" },
       ];
-    } else if (lowerCategory.includes('jewelry') || lowerCategory.includes('necklace') || lowerCategory.includes('ring')) {
+    } else if (
+      lowerCategory.includes("jewelry") ||
+      lowerCategory.includes("necklace") ||
+      lowerCategory.includes("ring")
+    ) {
       // Jewelry sizes (for rings and adjustable items)
       return [
         { label: "One Size", value: "OS" },
         { label: "Adjustable", value: "ADJ" },
       ];
-    } else if (lowerCategory.includes('bag') || lowerCategory.includes('backpack') || lowerCategory.includes('purse')) {
+    } else if (
+      lowerCategory.includes("bag") ||
+      lowerCategory.includes("backpack") ||
+      lowerCategory.includes("purse")
+    ) {
       // Bags typically come in one size
-      return [
-        { label: "One Size", value: "OS" },
-      ];
+      return [{ label: "One Size", value: "OS" }];
     } else {
       // Default sizes for other items
       return [
@@ -197,7 +214,7 @@ export default function ProductDetail() {
     }
   };
 
-  const sizes = getSizesForProduct(product?.category || '');
+  const sizes = getSizesForProduct(product?.category || "");
 
   const images = product
     ? [product.imageUrl, ...(product.altImageUrl ? [product.altImageUrl] : [])]
@@ -215,15 +232,17 @@ export default function ProductDetail() {
 
     if (!product) return;
 
-    dispatch(addItem({
-      id: product.id,
-      name: product.name,
-      price: parseFloat(product.price),
-      image: product.imageUrl,
-      style: `${product.id}FAEVU4645`,
-      size: selectedSize,
-      quantity: 1,
-    }));
+    dispatch(
+      addItem({
+        id: product.id,
+        name: product.name,
+        price: parseFloat(product.price),
+        image: product.imageUrl,
+        style: `${product.id}FAEVU4645`,
+        size: selectedSize,
+        quantity: 1,
+      })
+    );
 
     toast({
       title: "Added to shopping bag",
@@ -299,12 +318,14 @@ export default function ProductDetail() {
 
   return (
     <div className="bg-white">
-      <div className="relative bg-gray-50 h-[90vh] overflow-hidden">
-        <div 
-          className={`flex h-full ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} transition-transform duration-300 ease-out`}
-          style={{ 
+      <div className="relative bg-gray-50 h-[50%] md:h-[50vh] lg:h-[70vh] transition-all duration-300 overflow-hidden">
+        <div
+          className={`flex h-full ${
+            isDragging ? "cursor-grabbing" : "cursor-grab"
+          } transition-transform duration-300 ease-out`}
+          style={{
             transform: `translateX(-${currentImageIndex * 100}%)`,
-            userSelect: 'none'
+            userSelect: "none",
           }}
           onMouseDown={(e) => {
             setIsDragging(true);
@@ -317,8 +338,9 @@ export default function ProductDetail() {
             e.preventDefault();
             const x = e.pageX;
             const walk = x - startX;
-            
-            if (Math.abs(walk) > 50) { // Threshold for scroll
+
+            if (Math.abs(walk) > 50) {
+              // Threshold for scroll
               if (walk > 0 && currentImageIndex > 0) {
                 prevImage();
                 setIsDragging(false);
@@ -330,7 +352,10 @@ export default function ProductDetail() {
           }}
         >
           {images.map((image, index) => (
-            <div key={index} className="w-full h-full flex-shrink-0 flex items-center justify-center">
+            <div
+              key={index}
+              className="w-full h-full flex-shrink-0 flex items-center justify-center"
+            >
               <img
                 src={image}
                 alt={`${product.name} - Image ${index + 1}`}
@@ -365,7 +390,7 @@ export default function ProductDetail() {
             >
               <ChevronRight className="w-5 h-5" />
             </button>
-            
+
             {/* Image indicators */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
               {images.map((_, index) => (
@@ -377,9 +402,9 @@ export default function ProductDetail() {
                     setCurrentImageIndex(index);
                   }}
                   className={`w-2 h-2 rounded-full transition-all duration-200 shadow-sm ${
-                    index === currentImageIndex 
-                      ? 'bg-white scale-125' 
-                      : 'bg-white/50 hover:bg-white/75'
+                    index === currentImageIndex
+                      ? "bg-white scale-125"
+                      : "bg-white/50 hover:bg-white/75"
                   }`}
                 />
               ))}
@@ -389,20 +414,20 @@ export default function ProductDetail() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 bg-white">
-        <div className="border-t border-gray-200 p-8 lg:p-12 max-w-lg mx-auto space-y-8">
+        <div className="border-t border-gray-200 p-8 lg:p-12 lg:mx-[10%] space-y-6">
           <div className="space-y-2">
-            <h3 className="lv-luxury text-xs tracking-[0.2em] font-bold text-gray-500 uppercase">
+            <h3 className="lv-luxury mb-2 text-md font-bold tracking-[0.2em] text-gray-500 uppercase">
               PRODUCT DETAILS
             </h3>
             <div className="w-16 h-0.5 bg-primary"></div>
           </div>
 
           <div className="space-y-4">
-            <h1 className="lv-title text-2xl lg:text-3xl font-light text-black leading-tight">
+            <h1 className="lv-body font-mono lv-transition lv-title text-2xl lg:text-3xl font-light text-black leading-tight">
               {product.name}
             </h1>
-            <div className="text-xl font-bold text-black">
-              ${parseFloat(product.price).toLocaleString()}
+            <div className="text-xl lv-luxury font-bold text-primary">
+              $ {parseFloat(product.price).toLocaleString()}
             </div>
           </div>
 
@@ -434,10 +459,10 @@ export default function ProductDetail() {
             </Select>
           </div>
 
-          <div className="pt-4">
+          <div className="">
             <Button
               onClick={handleAddToBag}
-              className="w-full h-14 bg-black text-white hover:bg-gray-800 lv-luxury text-sm tracking-[0.1em] font-semibold uppercase lv-transition"
+              className="w-full p-6 rounded-full hover:shadow-xl bg-primary transition-all duration-300 text-white text-sm tracking-[0.1em]"
             >
               ADD TO BAG
             </Button>
@@ -449,36 +474,35 @@ export default function ProductDetail() {
               className="flex items-center gap-2 text-sm text-gray-600 hover:text-black lv-transition"
             >
               <Heart
-                className={`w-4 h-4 ${
-                  isSaved ? "fill-current text-red-500" : ""
+                className={`w-5 h-5 ${
+                  isSaved ? "fill-current text-primary" : ""
                 }`}
               />
-              {isSaved ? "SAVED" : "SAVE ITEM"}
             </button>
           </div>
         </div>
 
-        <div className="space-y-8 max-w-lg flex flex-col justify-center p-8 lg:p-12">
+        <div className="space-y-8 flex flex-col justify-center p-8 lg:p-12">
           {productDetails && (
             <>
               <div className="space-y-4">
-                <h4 className="lv-luxury text-xs tracking-[0.2em] font-bold text-gray-500 uppercase">
+                <h4 className="lv-luxury text-sm tracking-[0.2em] font-bold text-black">
                   DESCRIPTION
                 </h4>
-                <p className="lv-body text-sm leading-relaxed text-gray-700 font-light">
+                <p className="lv-body text-gray-700 hover:text-primary font-mono lv-transition text-xs leading-relaxed">
                   {productDetails.description}
                 </p>
               </div>
 
               <div className="space-y-4">
-                <h4 className="lv-luxury text-xs tracking-[0.2em] font-bold text-gray-500 uppercase">
+                <h4 className="lv-luxury text-sm tracking-[0.2em] font-bold text-black">
                   FEATURES
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-1 lv-body text-gray-700 font-mono lv-transition text-xs leading-relaxed">
                   {productDetails.specifications?.map(
                     (spec: string, index: number) => (
-                      <li key={index} className="lv-body text-sm text-gray-700 font-light flex items-start">
-                        <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                      <li key={index} className="flex items-start">
+                        <span className="w-1.5 h-1.5 bg-primary hover:text-primary rounded-full mt-1.5 mr-3 flex-shrink-0"></span>
                         {spec}
                       </li>
                     )
@@ -487,11 +511,11 @@ export default function ProductDetail() {
               </div>
 
               {productDetails.sizeGuide && (
-                <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
-                  <h5 className="lv-luxury text-xs font-bold text-black uppercase mb-2">
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h5 className="lv-luxury text-xs mb-2 font-bold text-primary">
                     {productDetails.sizeGuide.fitType}
                   </h5>
-                  <p className="lv-body text-sm text-gray-600 font-light">
+                  <p className="lv-body text-xs text-gray-500 hover:text-primary font-mono lv-transition">
                     {productDetails.sizeGuide.recommendation}
                   </p>
                 </div>
@@ -556,7 +580,7 @@ export default function ProductDetail() {
             ))}
       </div>
 
-      {relatedProducts && relatedProducts.length > 0 && (
+      {relatedProducts && relatedProducts?.products?.length > 0 && (
         <div className="bg-gray-100 py-8">
           <div className="px-4 mx-auto">
             <h2 className="text-center text-md mb-8 lv-luxury text-md font-bold text-black">
@@ -575,11 +599,11 @@ export default function ProductDetail() {
               style={{ userSelect: "none" }}
             >
               <div className="flex min-w-max gap-2">
-                {relatedProducts.map((relatedProduct) => (
+                {relatedProducts?.products?.map((relatedProduct) => (
                   <div
                     key={relatedProduct.id}
                     className="w-80 lex-shrink-0 cursor-pointer"
-                    onClick={(e) => {
+                    onClick={() => {
                       if (!isDragging) {
                         navigate(`/product/${relatedProduct.id}`);
                       }
@@ -611,7 +635,7 @@ export default function ProductDetail() {
                   <div
                     key={recentProduct.id}
                     className="w-56 lex-shrink-0 cursor-pointer"
-                    onClick={(e) => {
+                    onClick={() => {
                       if (!isDragging) {
                         navigate(`/product/${recentProduct.id}`);
                       }

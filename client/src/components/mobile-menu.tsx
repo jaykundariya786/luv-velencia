@@ -1,8 +1,7 @@
 import { X, Search, User, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useShoppingBagContext } from "@/contexts/shopping-bag-context";
-import { useAuth } from "@/contexts/auth-context";
+import { useAppSelector } from "@/hooks/redux";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -13,8 +12,12 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ isOpen, onClose, onSearchToggle, onShoppingBagOpen }: MobileMenuProps) {
   const navigate = useNavigate();
-  const { getTotalItems } = useShoppingBagContext();
-  const { user } = useAuth();
+  const { items } = useAppSelector((state) => state.shoppingBag);
+  const { user } = useAppSelector((state) => state.auth);
+  
+  const getTotalItems = () => {
+    return items.reduce((total, item) => total + item.quantity, 0);
+  };
 
   const handleAccountClick = () => {
     if (user) {

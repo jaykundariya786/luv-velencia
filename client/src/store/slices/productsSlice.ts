@@ -1,7 +1,17 @@
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { productsAPI } from '../../services/api';
-import { type Product } from '@shared/schema';
+// Local Product interface to avoid circular imports
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+  line?: string;
+  colors?: string[];
+  materials?: string[];
+  description?: string;
+}
 
 interface UseProductsFilters {
   category?: string;
@@ -13,7 +23,7 @@ interface UseProductsFilters {
 }
 
 interface ProductsState {
-  products: Product[];
+  products: any;
   currentProduct: Product | null;
   savedItems: Product[];
   recentlyViewed: Product[];
@@ -30,9 +40,46 @@ const initialState: ProductsState = {
   error: null,
 };
 
+// Simple API functions to avoid circular imports
+const productsAPI = {
+  getProducts: async (filters?: UseProductsFilters) => {
+    const params = new URLSearchParams();
+    if (filters?.category) params.append("category", filters.category);
+    if (filters?.line) params.append("line", filters.line);
+    if (filters?.sort) params.append("sort", filters.sort);
+    if (filters?.search) params.append("search", filters.search);
+    if (filters?.colors?.length)
+      params.append("colors", filters.colors.join(","));
+    if (filters?.materials?.length)
+      params.append("materials", filters.materials.join(","));
+
+    const response = await fetch(`/api/products?${params.toString()}`);
+    if (!response.ok) throw new Error("Failed to fetch products");
+    return response.json();
+  },
+
+  getProduct: async (id: number) => {
+    const response = await fetch(`/api/products/${id}`);
+    if (!response.ok) throw new Error("Failed to fetch product");
+    return response.json();
+  },
+
+  getSavedItems: async () => {
+    const response = await fetch("/api/saved-items");
+    if (!response.ok) throw new Error("Failed to fetch saved items");
+    return response.json();
+  },
+
+  getRecentlyViewed: async () => {
+    const response = await fetch("/api/recently-viewed");
+    if (!response.ok) throw new Error("Failed to fetch recently viewed");
+    return response.json();
+  },
+};
+
 // Async thunks
 export const fetchProducts = createAsyncThunk(
-  'products/fetchProducts',
+  "products/fetchProducts",
   async (filters?: UseProductsFilters) => {
     const response = await productsAPI.getProducts(filters);
     return response;
@@ -40,7 +87,7 @@ export const fetchProducts = createAsyncThunk(
 );
 
 export const fetchProduct = createAsyncThunk(
-  'products/fetchProduct',
+  "products/fetchProduct",
   async (id: number) => {
     const response = await productsAPI.getProduct(id);
     return response;
@@ -48,7 +95,7 @@ export const fetchProduct = createAsyncThunk(
 );
 
 export const fetchSavedItems = createAsyncThunk(
-  'products/fetchSavedItems',
+  "products/fetchSavedItems",
   async () => {
     const response = await productsAPI.getSavedItems();
     return response;
@@ -56,7 +103,7 @@ export const fetchSavedItems = createAsyncThunk(
 );
 
 export const fetchRecentlyViewed = createAsyncThunk(
-  'products/fetchRecentlyViewed',
+  "products/fetchRecentlyViewed",
   async () => {
     const response = await productsAPI.getRecentlyViewed();
     return response;
@@ -64,7 +111,7 @@ export const fetchRecentlyViewed = createAsyncThunk(
 );
 
 const productsSlice = createSlice({
-  name: 'products',
+  name: "products",
   initialState,
   reducers: {
     clearCurrentProduct: (state) => {
@@ -88,7 +135,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Failed to fetch products';
+        state.error = action.error.message || "Failed to fetch products";
       })
       // Fetch single product
       .addCase(fetchProduct.pending, (state) => {
@@ -102,7 +149,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProduct.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Failed to fetch product';
+        state.error = action.error.message || "Failed to fetch product";
       })
       // Fetch saved items
       .addCase(fetchSavedItems.fulfilled, (state, action) => {
@@ -116,4 +163,5 @@ const productsSlice = createSlice({
 });
 
 export const { clearCurrentProduct, clearError } = productsSlice.actions;
+
 export default productsSlice.reducer;

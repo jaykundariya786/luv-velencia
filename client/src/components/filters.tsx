@@ -168,7 +168,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
           <div className="lv-body text-black rounded-3xl overflow-hidden font-mono lv-transition absolute top-full left-0 mt-2 bg-white border border-gray-200 shadow-lg z-10 min-w-60 animate-fadeInUp opacity-0 transform translate-y-2">
             <button
               onClick={() => handleFilterChange("category", "all")}
-              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30 transition-all duration-200 hover:translate-x-1"
+              className="block w-full text-left px-4 py-3 text-xs hover:bg-primary/30"
             >
               All (83)
             </button>
@@ -275,7 +275,9 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
             <div className="grid grid-cols-2 gap-8">
               {/* Color Section */}
               <div>
-                <h4 className="text-xs font-medium mb-4 text-center">COLOR</h4>
+                <h4 className="mb-4 text-center lv-luxury text-xs font-bold text-black">
+                  COLOR
+                </h4>
                 <div className="space-y-3">
                   <label className="flex items-center">
                     <input
@@ -312,7 +314,9 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
                         }
                         className="mr-3 w-4 h-4 accent-primary"
                       />
-                      <span className="text-xs">{color}</span>
+                      <span className="text-xs lv-body font-mono text-foreground">
+                        {color}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -320,7 +324,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
 
               {/* Material Section */}
               <div>
-                <h4 className="text-xs font-medium mb-4 text-center">
+                <h4 className="mb-4 text-center lv-luxury text-xs font-bold text-black">
                   MATERIAL
                 </h4>
                 <div className="space-y-3">
@@ -357,7 +361,9 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
                         }
                         className="mr-3 w-4 h-4 accent-primary"
                       />
-                      <span className="text-xs">{material}</span>
+                      <span className="text-xs lv-body font-mono text-foreground">
+                        {material}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -365,19 +371,19 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
             </div>
 
             <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500 mb-4">
+              <p className="text-xs lv-body font-mono text-foreground text-gray-500 mb-4">
                 You can select several options at once.
               </p>
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={clearFilters}
-                  className="bg-black text-white px-6 py-2 text-xs font-medium hover:bg-gray-800"
+                  className="bg-primary text-white rounded-full px-6 py-2 text-xs font-mono"
                 >
                   CLEAR
                 </button>
                 <button
                   onClick={() => setOpenDropdown(null)}
-                  className="border border-gray-300 px-6 py-2 text-xs font-medium hover:bg-primary/30"
+                  className="bg-white text-primary border-primary border rounded-full px-6 py-2 text-xs font-mono"
                 >
                   CLOSE
                 </button>

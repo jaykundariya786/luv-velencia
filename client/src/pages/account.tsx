@@ -1,4 +1,3 @@
-
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { logout } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,7 @@ import Addresses from "./account/addresses";
 import Wallet from "./account/wallet";
 import SavedItems from "./account/saved-items";
 import Appointments from "./account/appointments";
+import { useEffect } from "react";
 
 function AccountHome() {
   const dispatch = useAppDispatch();
@@ -190,11 +190,17 @@ function AccountHome() {
 }
 
 export default function Account() {
-  const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.auth);
+
+  // Redirect to sign-in if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/sign-in');
+    }
+  }, [user, navigate]);
 
   if (!user) {
-    navigate("/sign-in");
     return null;
   }
 

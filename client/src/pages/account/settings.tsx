@@ -1,137 +1,166 @@
-
-import { useAppSelector } from '@/hooks/redux';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
-import { useState } from 'react';
+import { useAppSelector } from "@/hooks/redux";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Shield,
+  Check,
+  AlertCircle,
+  Settings,
+} from "lucide-react";
+import { useState } from "react";
 
 export default function AccountSettings() {
   const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
   const [settings, setSettings] = useState({
     emailNotifications: true,
     smsNotifications: false,
     marketingEmails: true,
     twoFactorAuth: false,
-    privateAccount: false
+    privateAccount: false,
   });
 
   const handleSave = () => {
-    console.log('Saving settings:', settings);
+    console.log("Saving settings:", settings);
   };
 
   const handleDeleteAccount = () => {
-    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      navigate('/');
+    if (
+      window.confirm(
+        "Are you sure you want to delete your account? This action cannot be undone."
+      )
+    ) {
+      navigate("/");
     }
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white font-['Helvetica_Neue',Arial,sans-serif]">
       {/* Hero Section */}
-      <div className="relative h-96 bg-cover bg-center overflow-hidden" style={{
-        backgroundImage: 'linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80")'
-      }}>
+      <div
+        className="relative h-[400px] bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
+        }}
+      >
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white">
-            <Button
-              onClick={() => navigate('/account')}
-              variant="ghost"
-              size="sm"
-              className="absolute top-8 left-8 text-white hover:bg-white/20 p-3 rounded-full"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="text-6xl font-light tracking-[0.3em] mb-8 lv-luxury">
-              ACCOUNT SETTINGS
+          <div className="text-center">
+            <h1 className="text-3xl md:text-5xl lv-luxury text-primary lv-fade-in tracking-[0.2em] drop-shadow-2xl">
+              SETTINGS
             </h1>
-            <div className="w-16 h-16 mx-auto border-2 border-white transform rotate-45 flex items-center justify-center">
-              <span className="text-3xl font-serif transform -rotate-45 font-bold">G</span>
-            </div>
           </div>
+        </div>
+
+        {/* Back Button */}
+        <Button
+          onClick={() => navigate("/account")}
+          variant="ghost"
+          size="sm"
+          className="absolute top-8 left-8 text-white hover:bg-white/20 p-3 rounded-full"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
+
+        {/* Diamond Logo */}
+        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-r from-[#0b3e27] to-[#197149] rotate-45 flex items-center justify-center">
+          <span className="text-white text-lg font-bold transform -rotate-45">
+            G
+          </span>
         </div>
       </div>
 
-      {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Personal Details Section */}
-        <div className="mb-20">
-          <h2 className="text-3xl font-light tracking-[0.2em] mb-12 text-black lv-luxury">
+        <div className="text-center mb-16">
+          <h2 className="lv-luxury font-bold text-primary text-3xl text-black mb-4">
             MY PERSONAL DETAILS
           </h2>
+          <div className="w-16 h-px bg-black mx-auto mb-12"></div>
+        </div>
 
+        <div className="border-2 rounded-3xl border-gray-200 p-8 mb-12 bg-white">
           <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="space-y-3">
-                <Label htmlFor="title" className="text-sm uppercase tracking-[0.15em] text-gray-500 font-medium">
-                  TITLE*
-                </Label>
-                <select 
-                  id="title"
-                  className="w-full px-0 py-4 border-0 border-b-2 border-gray-200 bg-transparent focus:border-black focus:outline-none text-base font-medium transition-colors duration-300"
-                >
-                  <option>Mr.</option>
-                  <option>Ms.</option>
-                  <option>Mrs.</option>
-                  <option>Dr.</option>
-                </select>
-              </div>
+            {/* Title */}
+            <div>
+              <Label className="lv-luxury text-md font-bold text-primary text-sm mb-4 block">
+                TITLE <span className="text-red-500">*</span>
+              </Label>
+              <Select defaultValue="Mr.">
+                <SelectTrigger className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white rounded-3xl">
+                  <SelectItem value="Mr.">Mr.</SelectItem>
+                  <SelectItem value="Ms.">Ms.</SelectItem>
+                  <SelectItem value="Mrs.">Mrs.</SelectItem>
+                  <SelectItem value="Dr.">Dr.</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-              <div className="space-y-3">
-                <Label htmlFor="firstName" className="text-sm uppercase tracking-[0.15em] text-gray-500 font-medium">
-                  FIRST NAME*
+            {/* Name Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <Label className="lv-luxury text-md font-bold text-primary text-sm mb-4 block">
+                  FIRST NAME <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="firstName"
-                  placeholder="Enter your first name"
-                  defaultValue={user?.name?.split(' ')[0] || ''}
-                  className="border-0 border-b-2 border-gray-200 rounded-none px-0 py-4 focus:border-black focus:ring-0 bg-transparent text-base font-medium transition-colors duration-300"
+                  defaultValue={user?.name?.split(" ")[0] || ""}
+                  className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md"
                 />
               </div>
-
-              <div className="space-y-3">
-                <Label htmlFor="lastName" className="text-sm uppercase tracking-[0.15em] text-gray-500 font-medium">
-                  LAST NAME*
+              <div>
+                <Label className="lv-luxury text-md font-bold text-primary text-sm mb-4 block">
+                  LAST NAME <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="lastName"
-                  placeholder="Enter your last name"
-                  defaultValue={user?.name?.split(' ')[1] || ''}
-                  className="border-0 border-b-2 border-gray-200 rounded-none px-0 py-4 focus:border-black focus:ring-0 bg-transparent text-base font-medium transition-colors duration-300"
+                  defaultValue={user?.name?.split(" ")[1] || ""}
+                  className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-              <div className="space-y-3">
-                <Label htmlFor="country" className="text-sm uppercase tracking-[0.15em] text-gray-500 font-medium">
-                  COUNTRY / REGION*
+            {/* Country and Date */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <Label className="lv-luxury text-md font-bold text-primary text-sm mb-4 block">
+                  COUNTRY / REGION <span className="text-red-500">*</span>
                 </Label>
-                <select 
-                  id="country"
-                  className="w-full px-0 py-4 border-0 border-b-2 border-gray-200 bg-transparent focus:border-black focus:outline-none text-base font-medium transition-colors duration-300"
-                >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>United Kingdom</option>
-                  <option>France</option>
-                  <option>Italy</option>
-                </select>
+                <Select defaultValue="United States">
+                  <SelectTrigger className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white rounded-3xl">
+                    <SelectItem value="United States">United States</SelectItem>
+                    <SelectItem value="Canada">Canada</SelectItem>
+                    <SelectItem value="United Kingdom">
+                      United Kingdom
+                    </SelectItem>
+                    <SelectItem value="France">France</SelectItem>
+                    <SelectItem value="Italy">Italy</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-
-              <div className="space-y-3">
-                <Label htmlFor="birthdate" className="text-sm uppercase tracking-[0.15em] text-gray-500 font-medium">
-                  DATE OF BIRTH*
+              <div>
+                <Label className="lv-luxury text-md font-bold text-primary text-sm mb-4 block">
+                  DATE OF BIRTH <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="birthdate"
                   type="date"
-                  placeholder="2/5/1997"
-                  className="border-0 border-b-2 border-gray-200 rounded-none px-0 py-4 focus:border-black focus:ring-0 bg-transparent text-base font-medium transition-colors duration-300"
+                  className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md"
                 />
               </div>
             </div>
@@ -139,50 +168,49 @@ export default function AccountSettings() {
         </div>
 
         {/* Credentials Section */}
-        <div className="mb-20">
-          <h2 className="text-3xl font-light tracking-[0.2em] mb-12 text-black lv-luxury">
+        <div className="text-center mb-16">
+          <h2 className="lv-luxury font-bold text-primary text-3xl text-black mb-4">
             MY CREDENTIALS
           </h2>
+          <div className="w-16 h-px bg-black mx-auto mb-12"></div>
+        </div>
 
-          <div className="max-w-lg">
-            <div className="space-y-3">
-              <Label htmlFor="email" className="text-sm uppercase tracking-[0.15em] text-gray-500 font-medium">
-                EMAIL*
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                defaultValue={user?.email || 'kthagith09@bestbait.com'}
-                className="border-0 border-b-2 border-gray-200 rounded-none px-0 py-4 focus:border-black focus:ring-0 bg-transparent text-base font-medium transition-colors duration-300"
-              />
-            </div>
+        <div className="border-2 border-gray-200 rounded-3xl p-8 mb-12 bg-white">
+          <div>
+            <Label className="lv-luxury text-md font-bold text-primary text-sm mb-4 block">
+              EMAIL <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="email"
+              disabled
+              defaultValue={user?.email || "kthagith09@bestbait.com"}
+              className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md"
+            />
           </div>
         </div>
 
-        {/* Privacy Settings */}
-        <div className="mb-20">
-          <h2 className="text-3xl font-light tracking-[0.2em] mb-12 text-black lv-luxury">
+        {/* Privacy Settings Section */}
+        <div className="text-center mb-16">
+          <h2 className="lv-luxury font-bold text-primary text-3xl text-black mb-4">
             PRIVACY SETTINGS
           </h2>
+          <div className="w-16 h-px bg-black mx-auto mb-12"></div>
+        </div>
 
-          <div className="bg-gray-50 p-8 rounded-lg">
+        <div className="border-2 border-gray-200 p-8 mb-12 rounded-3xl bg-white">
+          <div className="space-y-8">
+            {/* Marketing Communications */}
             <div className="flex items-start space-x-4">
-              <input 
-                type="checkbox" 
-                id="privacy-consent"
-                defaultChecked
-                className="mt-2 w-5 h-5 border-2 border-gray-300 rounded focus:ring-2 focus:ring-black accent-black"
-              />
-              <div className="flex-1 space-y-4">
-                <Label htmlFor="privacy-consent" className="cursor-pointer text-base leading-relaxed text-gray-800 font-medium">
-                  I would like to receive updates about GUCCI new activities, exclusive products, tailored services and to have a personalised client experience based on my interests.
-                </Label>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Privacy laws may grant you certain rights such as the right to access, delete, modify and rectify your data, or to restrict or object to processing, as well as the right to data portability. You can also lodge a complaint with your competent regulator. You can withdraw your consent or delete your profile at any time. For further information regarding our privacy practices and your rights, please contact us at{' '}
-                  <a href="mailto:privacy@gucci.com" className="underline hover:text-black transition-colors font-medium">
-                    privacy@gucci.com
-                  </a>.
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-5 h-5 border-2 border-black rounded-sm flex items-center justify-center bg-white cursor-pointer hover:bg-gray-50 transition-colors">
+                  <Check className="w-3 h-3 text-black" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <p className="lv-body text-gray-700 text-xs font-mono lv-transition">
+                  I would like to receive updates about GUCCI new activities,
+                  exclusive products, tailored services and to have a
+                  personalised client experience based on my interests.
                 </p>
               </div>
             </div>
@@ -190,21 +218,79 @@ export default function AccountSettings() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-8 border-t border-gray-200">
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-6 pt-8">
           <Button
             onClick={handleDeleteAccount}
             variant="outline"
-            className="border-2 border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 uppercase tracking-[0.1em] text-sm px-10 py-4 font-medium transition-all duration-300"
+            className="border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white px-12 py-6 text-xs lv-luxury font-bold rounded-full transition-all duration-300"
           >
             Deactivate Account
           </Button>
 
           <Button
             onClick={handleSave}
-            className="bg-black text-white hover:bg-gray-800 uppercase tracking-[0.1em] text-sm px-12 py-4 font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+            variant="outline"
+            className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-12 py-6 text-xs lv-luxury font-bold rounded-full transition-all duration-300"
           >
-            SAVE CHANGES
+            Save Changes
           </Button>
+        </div>
+
+        {/* Enhanced Security Notice */}
+        <div className="mt-16 relative">
+          {/* Background with subtle pattern */}
+          <div className="absolute inset-0 rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50"></div>
+          <div className="relative border-2 rounded-3xl border-emerald-200 p-10">
+            <div className="md:flex lg:flex grid grid-cols-1 items-start gap-8">
+              {/* Enhanced Shield Icon */}
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Shield className="w-8 h-8 text-white" />
+                </div>
+              </div>
+
+              <div className="flex-1">
+                <div className="mb-6">
+                  <h3 className="text-2xl lv-luxury text-md font-bold text-primary mb-2">
+                    SECURE ACCOUNT
+                  </h3>
+                  <div className="w-12 h-px bg-emerald-600"></div>
+                </div>
+
+                <p className="lv-body text-gray-500 font-mono text-sm lv-transition mb-6">
+                  Your personal information is protected with bank-level
+                  encryption. We follow strict privacy guidelines and never
+                  share your data without your explicit consent.
+                </p>
+
+                {/* Security Features */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    <span className="lv-body text-gray-500 font-mono text-sm lv-transition">
+                      SSL ENCRYPTION
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    <span className="lv-body text-gray-500 font-mono text-sm lv-transition">
+                      GDPR COMPLIANT
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    <span className="lv-body text-gray-500 font-mono text-sm lv-transition">
+                      24/7 MONITORING
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Decorative corner elements */}
+            <div className="absolute top-4 rounded-lg right-4 w-8 h-8 border-t-2 border-r-2 border-emerald-300 opacity-30"></div>
+            <div className="absolute bottom-4 rounded-lg left-4 w-8 h-8 border-b-2 border-l-2 border-emerald-300 opacity-30"></div>
+          </div>
         </div>
       </div>
     </div>

@@ -39,8 +39,6 @@ interface SearchOverlayProps {
   onSearch: (searchTerm: string) => void;
 }
 
-
-
 // Main Header Component
 interface HeaderProps {
   onMobileMenuToggle: () => void;
@@ -61,17 +59,13 @@ function MobileMenu({
   const navigate = useNavigate();
   const { items } = useAppSelector((state: RootState) => state.shoppingBag);
   const { user } = useAppSelector((state: RootState) => state.auth);
-  
+
   const getTotalItems = () => {
     return items.reduce((total, item) => total + item.quantity, 0);
   };
 
   const handleAccountClick = () => {
-    if (user) {
-      navigate("/account");
-    } else {
-      navigate("/sign-in");
-    }
+    onShoppingBagOpen();
     onClose();
   };
 
@@ -113,23 +107,12 @@ function MobileMenu({
             <Search className="w-5 h-5" />
           </button>
 
-          {user ? (
-            <a
-              onClick={handleAccountClick}
-              href="/account"
-              className="py-2 lv-body text-lg font-medium lv-transition hover:text-primary"
-            >
-              <User className="h-5 w-5" />
-            </a>
-          ) : (
-            <a
-              onClick={handleAccountClick}
-              href="/sign-in"
-              className="py-2 lv-body text-lg font-medium lv-transition hover:text-primary"
-            >
-              <User className="h-5 w-5" />
-            </a>
-          )}
+          <button
+            onClick={handleAccountClick}
+            className="py-2 lv-body text-lg font-medium lv-transition hover:text-primary"
+          >
+            <User className="h-5 w-5" />
+          </button>
 
           <button
             onClick={handleShoppingBagClick}
@@ -299,7 +282,7 @@ export default function Header({
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const { items } = useAppSelector((state: RootState) => state.shoppingBag);
   const { user } = useAppSelector((state: RootState) => state.auth);
-  
+
   const getTotalItems = () => {
     return items.reduce((total, item) => total + item.quantity, 0);
   };
@@ -320,25 +303,28 @@ export default function Header({
           {/* Left Section */}
           <div className="flex items-center space-x-2 sm:space-x-6 flex-1"></div>
 
-          <h1 className="text-lg sm:text-xl md:text-2xl lv-luxury cursor-pointer text-white hover:text-black/20 lv-transition">
+          <a
+            href="/"
+            className="text-lg sm:text-xl md:text-2xl lv-luxury cursor-pointer text-white hover:text-black/20 lv-transition"
+          >
             LUV VELENCIA
-          </h1>
+          </a>
 
           <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-8 flex-1 justify-end">
             <Search
               onClick={onSearchToggle}
-              className="h-4 w-4 sm:h-5 sm:w-5 hidden md:block"
+              className="h-4 w-4 sm:h-5 sm:w-5 hidden md:block text-white cursor-pointer hover:text-black/20 lv-transition"
             />
 
             <button onClick={handleAccountClick}>
-              <User className="h-4 w-4 sm:h-5 sm:w-5 hidden md:block" />
+              <User className="h-4 w-4 sm:h-5 sm:w-5 hidden md:block text-white cursor-pointer hover:text-black/20 lv-transition" />
             </button>
 
             <div
               onClick={() => setIsShoppingBagOpen(true)}
               className="hidden md:block relative"
             >
-              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
+              <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 hidden md:block text-white cursor-pointer hover:text-black/20 lv-transition" />
               {getTotalItems() > 0 && (
                 <span className="absolute top-0.5 right-0.5 sm:-top-2.5 sm:-right-2.5 bg-black text-white text-[10px] sm:text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
                   {getTotalItems()}
@@ -347,7 +333,7 @@ export default function Header({
             </div>
             <Menu
               onClick={onMobileMenuToggle}
-              className="w-4 h-4 sm:w-5 sm:h-5"
+              className="h-4 w-4 sm:h-5 sm:w-5 hidden md:block text-white cursor-pointer hover:text-black/20 lv-transition"
             />
           </div>
         </div>

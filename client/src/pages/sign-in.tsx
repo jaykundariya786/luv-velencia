@@ -1,9 +1,11 @@
+
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { login } from '@/store/slices/authSlice';
+import { setLoading, loginSuccess, loginFailure } from '@/store/slices/authSlice';
+import { authAPI } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SignIn() {
@@ -24,16 +26,17 @@ export default function SignIn() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    dispatch(setLoading(true));
 
     try {
-      const mockUser = {
-        id: isSignUp ? Date.now().toString() : '1',
-        email: formData.email,
-        name: isSignUp ? formData.name : formData.email.split('@')[0],
-        provider: 'email' as const
-      };
+      let user;
+      if (isSignUp) {
+        user = await authAPI.signup(formData.email, formData.password, formData.name);
+      } else {
+        user = await authAPI.login(formData.email, formData.password);
+      }
 
-      dispatch(login(mockUser));
+      dispatch(loginSuccess(user));
 
       toast({
         title: isSignUp ? "Account created successfully" : "Signed in successfully",
@@ -42,24 +45,23 @@ export default function SignIn() {
 
       navigate(from, { replace: true });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
+      dispatch(loginFailure(errorMessage));
+      
       toast({
         variant: "destructive",
         title: isSignUp ? "Signup failed" : "Login failed",
-        description: "Please try again."
+        description: errorMessage
       });
     }
   };
 
   const handleGoogleLogin = async () => {
-    try {
-      const mockUser = {
-        id: 'google_' + Date.now().toString(),
-        email: 'user@gmail.com',
-        name: 'Google User',
-        provider: 'google' as const
-      };
+    dispatch(setLoading(true));
 
-      dispatch(login(mockUser));
+    try {
+      const user = await authAPI.loginWithGoogle();
+      dispatch(loginSuccess(user));
 
       toast({
         title: "Signed in with Google",
@@ -67,24 +69,23 @@ export default function SignIn() {
       });
       navigate(from, { replace: true });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Google sign-in failed';
+      dispatch(loginFailure(errorMessage));
+      
       toast({
         variant: "destructive",
         title: "Google sign-in failed",
-        description: "Please try again."
+        description: errorMessage
       });
     }
   };
 
   const handleAppleLogin = async () => {
-    try {
-      const mockUser = {
-        id: 'apple_' + Date.now().toString(),
-        email: 'user@icloud.com',
-        name: 'Apple User',
-        provider: 'apple' as const
-      };
+    dispatch(setLoading(true));
 
-      dispatch(login(mockUser));
+    try {
+      const user = await authAPI.loginWithApple();
+      dispatch(loginSuccess(user));
 
       toast({
         title: "Signed in with Apple",
@@ -92,10 +93,13 @@ export default function SignIn() {
       });
       navigate(from, { replace: true });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Apple sign-in failed';
+      dispatch(loginFailure(errorMessage));
+      
       toast({
         variant: "destructive",
         title: "Apple sign-in failed",
-        description: "Please try again."
+        description: errorMessage
       });
     }
   };
@@ -203,7 +207,7 @@ export default function SignIn() {
               className="w-full bg-black text-white hover:bg-gray-800 h-12 uppercase tracking-wider text-sm font-medium"
               disabled={isLoading}
             >
-              {isSignUp ? 'CREATE ACCOUNT' : 'PROCEED TO CHECKOUT'}
+              {isLoading ? 'LOADING...' : (isSignUp ? 'CREATE ACCOUNT' : 'PROCEED TO CHECKOUT')}
             </Button>
           </form>
 
@@ -212,6 +216,7 @@ export default function SignIn() {
             <button
               onClick={() => setIsSignUp(!isSignUp)}
               className="text-sm text-gray-600 hover:text-black underline"
+              disabled={isLoading}
             >
               {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             </button>

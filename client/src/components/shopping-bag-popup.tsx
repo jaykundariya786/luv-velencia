@@ -1,6 +1,10 @@
 import { X, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ShoppingBagItem, updateQuantity, removeItem } from "@/store/slices/shoppingBagSlice";
+import {
+  ShoppingBagItem,
+  updateQuantity,
+  removeItem,
+} from "@/store/slices/shoppingBagSlice";
 import { useAppDispatch } from "@/hooks/redux";
 import { useNavigate } from "react-router-dom";
 
@@ -82,7 +86,9 @@ export default function ShoppingBagPopup({
                       {item.name}
                     </h3>
                     <button
-                      onClick={() => dispatch(removeItem({ id: item.id, size: item.size }))}
+                      onClick={() =>
+                        dispatch(removeItem({ id: item.id, size: item.size }))
+                      }
                       className="text-gray-600 p-1"
                     >
                       <X className="w-4 h-4" />
@@ -104,7 +110,13 @@ export default function ShoppingBagPopup({
                     <div className="flex items-center border border-gray-300 rounded ">
                       <button
                         onClick={() =>
-                          dispatch(updateQuantity({ id: item.id, size: item.size, quantity: item.quantity - 1 }))
+                          dispatch(
+                            updateQuantity({
+                              id: item.id,
+                              size: item.size,
+                              quantity: item.quantity - 1,
+                            })
+                          )
                         }
                         className="p-1 hover:bg-gray-100 transition-colors"
                         disabled={item.quantity <= 1}
@@ -116,7 +128,13 @@ export default function ShoppingBagPopup({
                       </span>
                       <button
                         onClick={() =>
-                          dispatch(updateQuantity({ id: item.id, size: item.size, quantity: item.quantity + 1 }))
+                          dispatch(
+                            updateQuantity({
+                              id: item.id,
+                              size: item.size,
+                              quantity: item.quantity + 1,
+                            })
+                          )
                         }
                         className="p-1 hover:bg-gray-100 transition-colors"
                       >
@@ -143,7 +161,7 @@ export default function ShoppingBagPopup({
           </div>
 
           {/* Action Buttons */}
-          <div className="space-y-2 lv-luxury mb-4 text-md font-bold text-black">
+          <div className="space-y-2 lv-luxury mb-4 text-md font-bold text-white">
             <a className="w-full flex rounded-full items-center justify-center bg-primary hover:shadow-xl transition-all h-10 uppercase text-xs">
               Checkout
             </a>
@@ -152,7 +170,7 @@ export default function ShoppingBagPopup({
                 navigate("/shopping-bag");
                 onClose();
               }}
-              className="w-full flex rounded-full border border-black items-center justify-center hover:shadow-xl transition-all h-10 uppercase text-xs"
+              className="w-full flex rounded-full border border-primary text-primary items-center justify-center hover:shadow-xl transition-all h-10 uppercase text-xs"
             >
               View Shopping Bag
             </a>

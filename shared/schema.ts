@@ -1,4 +1,11 @@
-import { pgTable, text, serial, integer, boolean, decimal } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  boolean,
+  decimal,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -16,7 +23,9 @@ export const products = pgTable("products", {
 
 export const savedItems = pgTable("saved_items", {
   id: serial("id").primaryKey(),
-  productId: integer("product_id").references(() => products.id).notNull(),
+  productId: integer("product_id")
+    .references(() => products.id)
+    .notNull(),
   sessionId: text("session_id").notNull(),
 });
 
@@ -34,9 +43,26 @@ export type InsertSavedItem = z.infer<typeof insertSavedItemSchema>;
 export type SavedItem = typeof savedItems.$inferSelect;
 
 // Filter and sort enums
-export const CategoryFilter = z.enum(["shoes", "clothing", "accessories", "bags", "jewelry"]);
-export const LineFilter = z.enum(["gucci-re-web", "ophidia", "gg-canvas", "staffa", "chroma"]);
-export const SortOption = z.enum(["newest", "price-low", "price-high", "popular"]);
+export const CategoryFilter = z.enum([
+  "shoes",
+  "clothing",
+  "accessories",
+  "bags",
+  "jewelry",
+]);
+export const LineFilter = z.enum([
+  "gucci-re-web",
+  "ophidia",
+  "gg-canvas",
+  "staffa",
+  "chroma",
+]);
+export const SortOption = z.enum([
+  "newest",
+  "price-low",
+  "price-high",
+  "popular",
+]);
 
 export type CategoryFilter = z.infer<typeof CategoryFilter>;
 export type LineFilter = z.infer<typeof LineFilter>;

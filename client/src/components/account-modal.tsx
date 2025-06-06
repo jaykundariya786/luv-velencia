@@ -14,7 +14,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "@/hooks/redux";
 import { RootState } from "@/store";
@@ -144,18 +150,18 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
   };
 
   const handleNavigation = (path: string) => {
-    navigate(path);
     onClose();
+    setTimeout(() => navigate(path), 100);
   };
 
   const handleSavePayment = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     toast({
       title: "Payment method added",
       description: "Your payment method has been saved successfully.",
     });
-    
+
     setPaymentData({
       cardNumber: "",
       expiryMonth: "",
@@ -282,10 +288,10 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                 <Button
                   onClick={handleGoogleLogin}
                   variant="outline"
-                  className="w-full h-10 border border-gray-300 hover:bg-gray-50 text-xs font-medium"
+                  className="w-full h-10 border-2 lv-luxury text-md rounded-full border-primary hover:bg-gray-50 text-xs font-medium"
                   disabled={isLoading}
                 >
-                  <div className="flex items-center justify-center gap-2">
+                  <div className="flex items-center  justify-center gap-2">
                     <svg className="w-4 h-4" viewBox="0 0 24 24">
                       <path
                         fill="#4285F4"
@@ -311,7 +317,7 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                 <Button
                   onClick={handleAppleLogin}
                   variant="outline"
-                  className="w-full h-10 border border-gray-300 hover:bg-gray-50 text-xs font-medium"
+                  className="w-full h-10 border-2 lv-luxury text-md rounded-full border-primary hover:bg-gray-50 text-xs font-medium"
                   disabled={isLoading}
                 >
                   <div className="flex items-center justify-center gap-2">
@@ -342,7 +348,7 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    className="h-10 bg-gray-50 border-0 placeholder:text-gray-500 text-sm"
+                    className="h-10 bg-gray-50 rounded-full px-4 border-0 placeholder:text-gray-500 text-sm"
                     required
                   />
                 )}
@@ -354,7 +360,7 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="h-10 bg-gray-50 border-0 placeholder:text-gray-500 text-sm"
+                  className="h-10 bg-gray-50 rounded-full px-4 border-0 placeholder:text-gray-500 text-sm"
                   required
                 />
 
@@ -365,13 +371,13 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
-                  className="h-10 bg-gray-50 border-0 placeholder:text-gray-500 text-sm"
+                  className="h-10 bg-gray-50 rounded-full px-4 border-0 placeholder:text-gray-500 text-sm"
                   required
                 />
 
                 <Button
                   type="submit"
-                  className="w-full bg-black text-white hover:bg-gray-800 h-10 uppercase tracking-wider text-xs font-medium"
+                  className="w-full bg-primary lv-luxury rounded-full text-md font-bold text-primary text-white hover:shadow-xl transition-all duration-300 h-10 text-xs"
                   disabled={isLoading}
                 >
                   {isSignUp ? "CREATE ACCOUNT" : "SIGN IN"}
@@ -425,7 +431,10 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                       placeholder="1234 5678 9012 3456"
                       value={paymentData.cardNumber}
                       onChange={(e) =>
-                        setPaymentData({ ...paymentData, cardNumber: e.target.value })
+                        setPaymentData({
+                          ...paymentData,
+                          cardNumber: e.target.value,
+                        })
                       }
                       className="mt-1 h-12 bg-gray-50 border-0 placeholder:text-gray-500"
                       required
@@ -447,11 +456,16 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                            <SelectItem key={month} value={month.toString().padStart(2, '0')}>
-                              {month.toString().padStart(2, '0')}
-                            </SelectItem>
-                          ))}
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map(
+                            (month) => (
+                              <SelectItem
+                                key={month}
+                                value={month.toString().padStart(2, "0")}
+                              >
+                                {month.toString().padStart(2, "0")}
+                              </SelectItem>
+                            )
+                          )}
                         </SelectContent>
                       </Select>
                     </div>
@@ -470,7 +484,10 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map((year) => (
+                          {Array.from(
+                            { length: 10 },
+                            (_, i) => new Date().getFullYear() + i
+                          ).map((year) => (
                             <SelectItem key={year} value={year.toString()}>
                               {year}
                             </SelectItem>
@@ -490,7 +507,10 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                         placeholder="123"
                         value={paymentData.cvv}
                         onChange={(e) =>
-                          setPaymentData({ ...paymentData, cvv: e.target.value })
+                          setPaymentData({
+                            ...paymentData,
+                            cvv: e.target.value,
+                          })
                         }
                         className="mt-1 h-12 bg-gray-50 border-0 placeholder:text-gray-500"
                         maxLength={4}
@@ -507,7 +527,10 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                         placeholder="John Doe"
                         value={paymentData.holderName}
                         onChange={(e) =>
-                          setPaymentData({ ...paymentData, holderName: e.target.value })
+                          setPaymentData({
+                            ...paymentData,
+                            holderName: e.target.value,
+                          })
                         }
                         className="mt-1 h-12 bg-gray-50 border-0 placeholder:text-gray-500"
                         required
@@ -536,9 +559,13 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="United States">United States</SelectItem>
+                        <SelectItem value="United States">
+                          United States
+                        </SelectItem>
                         <SelectItem value="Canada">Canada</SelectItem>
-                        <SelectItem value="United Kingdom">United Kingdom</SelectItem>
+                        <SelectItem value="United Kingdom">
+                          United Kingdom
+                        </SelectItem>
                         <SelectItem value="Australia">Australia</SelectItem>
                       </SelectContent>
                     </Select>
@@ -552,7 +579,10 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                       type="text"
                       value={paymentData.billingAddress}
                       onChange={(e) =>
-                        setPaymentData({ ...paymentData, billingAddress: e.target.value })
+                        setPaymentData({
+                          ...paymentData,
+                          billingAddress: e.target.value,
+                        })
                       }
                       className="mt-1 h-12 bg-gray-50 border-0 placeholder:text-gray-500"
                       required
@@ -568,7 +598,10 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                         type="text"
                         value={paymentData.city}
                         onChange={(e) =>
-                          setPaymentData({ ...paymentData, city: e.target.value })
+                          setPaymentData({
+                            ...paymentData,
+                            city: e.target.value,
+                          })
                         }
                         className="mt-1 h-12 bg-gray-50 border-0 placeholder:text-gray-500"
                         required
@@ -605,7 +638,10 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                         type="text"
                         value={paymentData.zipCode}
                         onChange={(e) =>
-                          setPaymentData({ ...paymentData, zipCode: e.target.value })
+                          setPaymentData({
+                            ...paymentData,
+                            zipCode: e.target.value,
+                          })
                         }
                         className="mt-1 h-12 bg-gray-50 border-0 placeholder:text-gray-500"
                         required

@@ -1,11 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { authAPI } from '../../services/api';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface User {
   id: string;
   email: string;
   name: string;
   provider: 'email' | 'google' | 'apple';
+  token?: string;
 }
 
 interface AuthState {
@@ -14,143 +14,79 @@ interface AuthState {
   error: string | null;
 }
 
+// Load initial state from localStorage
+const loadUserFromStorage = (): User | null => {
+  try {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  } catch (error) {
+    console.error('Error loading user from storage:', error);
+    return null;
+  }
+};
+
 const initialState: AuthState = {
-  user: null,
+  user: loadUserFromStorage(),
   isLoading: false,
   error: null,
 };
-
-// Async thunks
-export const loginUser = createAsyncThunk(
-  'auth/login',
-  async ({ email, password }: { email: string; password: string }) => {
-    const response = await authAPI.login(email, password);
-    localStorage.setItem('user', JSON.stringify(response));
-    return response;
-  }
-);
-
-export const signupUser = createAsyncThunk(
-  'auth/signup',
-  async ({ email, password, name }: { email: string; password: string; name: string }) => {
-    const response = await authAPI.signup(email, password, name);
-    localStorage.setItem('user', JSON.stringify(response));
-    return response;
-  }
-);
-
-export const loginWithGoogle = createAsyncThunk(
-  'auth/loginWithGoogle',
-  async () => {
-    const response = await authAPI.loginWithGoogle();
-    localStorage.setItem('user', JSON.stringify(response));
-    return response;
-  }
-);
-
-export const loginWithApple = createAsyncThunk(
-  'auth/loginWithApple',
-  async () => {
-    const response = await authAPI.loginWithApple();
-    localStorage.setItem('user', JSON.stringify(response));
-    return response;
-  }
-);
-
-export const loadUserFromStorage = createAsyncThunk(
-  'auth/loadFromStorage',
-  async () => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      return JSON.parse(storedUser);
-    }
-    return null;
-  }
-);
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    login: (state, action) => {
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+    loginSuccess: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
       state.isLoading = false;
       state.error = null;
+      // Save to localStorage
+      localStorage.setItem('user', JSON.stringify(action.payload));
+    },
+    loginFailure: (state, action: PayloadAction<string>) => {
+      state.user = null;
+      state.isLoading = false;
+      state.error = action.payload;
     },
     logout: (state) => {
       state.user = null;
       state.isLoading = false;
       state.error = null;
+      // Remove from localStorage
+      localStorage.removeItem('user');
     },
     clearError: (state) => {
       state.error = null;
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      // Login
-      .addCase(loginUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload;
-        state.error = null;
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.error.message || 'Login failed';
-      })
-      // Signup
-      .addCase(signupUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(signupUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload;
-        state.error = null;
-      })
-      .addCase(signupUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.error.message || 'Signup failed';
-      })
-      // Google login
-      .addCase(loginWithGoogle.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(loginWithGoogle.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload;
-        state.error = null;
-      })
-      .addCase(loginWithGoogle.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.error.message || 'Google login failed';
-      })
-      // Apple login
-      .addCase(loginWithApple.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(loginWithApple.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload;
-        state.error = null;
-      })
-      .addCase(loginWithApple.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.error.message || 'Apple login failed';
-      })
-      // Load from storage
-      .addCase(loadUserFromStorage.fulfilled, (state, action) => {
-        state.user = action.payload;
-        state.isLoading = false;
-      });
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+        // Update localStorage
+        localStorage.setItem('user', JSON.stringify(state.user));
+      }
+    },
+    loadUserFromStorage: (state) => {
+      const storedUser = loadUserFromStorage();
+      if (storedUser) {
+        state.user = storedUser;
+      }
+    },
   },
 });
 
-export const { login, logout, clearError } = authSlice.actions;
+export const { 
+  setLoading, 
+  loginSuccess, 
+  loginFailure, 
+  logout, 
+  clearError, 
+  updateUser,
+  loadUserFromStorage: loadUserFromStorageAction
+} = authSlice.actions;
+
+// Export login action for header component
+export const login = loginSuccess;
+
 export default authSlice.reducer;

@@ -1,13 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authSlice from './slices/authSlice';
-import shoppingBagSlice from './slices/shoppingBagSlice';
-import productsSlice from './slices/productsSlice';
+import authReducer from './slices/authSlice';
+import shoppingBagReducer from './slices/shoppingBagSlice';
+import productsReducer from './slices/productsSlice';
 
 export const store = configureStore({
   reducer: {
-    auth: authSlice,
-    shoppingBag: shoppingBagSlice,
-    products: productsSlice,
+    auth: authReducer,
+    shoppingBag: shoppingBagReducer,
+    products: productsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
