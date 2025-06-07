@@ -1,7 +1,11 @@
-import { useAppSelector } from "@/hooks/redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Shield, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useAppSelector } from "@/hooks/redux";
+import { getUserProfile, updateUserProfile } from "@/services/api";
 import {
   Select,
   SelectContent,
@@ -9,21 +13,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  User,
-  Mail,
-  Shield,
-  Check,
-  AlertCircle,
-  Settings,
-} from "lucide-react";
-import { useState } from "react";
 
 export default function AccountSettings() {
   const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
+  const [profile, setProfile] = useState({
+    title: "",
+    firstName: "",
+    lastName: "",
+    country: "",
+    dateOfBirth: "",
+    email: "",
+  });
+
   const [settings, setSettings] = useState({
     emailNotifications: true,
     smsNotifications: false,
@@ -32,8 +34,43 @@ export default function AccountSettings() {
     privateAccount: false,
   });
 
-  const handleSave = () => {
-    console.log("Saving settings:", settings);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profileData = await getUserProfile(user?.id); // Assuming you have user id
+        setProfile({
+          title: profileData.title || "",
+          firstName: profileData.firstName || "",
+          lastName: profileData.lastName || "",
+          country: profileData.country || "",
+          dateOfBirth: profileData.dateOfBirth || "",
+          email: profileData.email || "",
+        });
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      }
+    };
+
+    if (user?.id) {
+      fetchProfile();
+    }
+  }, [user?.id]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setProfile((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = async () => {
+    try {
+      await updateUserProfile(user?.id, profile); // Assuming you have user id
+      console.log("Profile updated successfully!");
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -98,9 +135,14 @@ export default function AccountSettings() {
               <Label className="lv-luxury text-md font-bold text-primary text-sm mb-4 block">
                 TITLE <span className="text-red-500">*</span>
               </Label>
-              <Select defaultValue="Mr.">
+              <Select
+                value={profile.title}
+                onValueChange={(value) =>
+                  handleInputChange({ target: { name: "title", value } })
+                }
+              >
                 <SelectTrigger className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md">
-                  <SelectValue />
+                  <SelectValue placeholder="Select title" />
                 </SelectTrigger>
                 <SelectContent className="bg-white rounded-3xl">
                   <SelectItem value="Mr.">Mr.</SelectItem>
@@ -118,7 +160,9 @@ export default function AccountSettings() {
                   FIRST NAME <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  defaultValue={user?.name?.split(" ")[0] || ""}
+                  name="firstName"
+                  value={profile.firstName}
+                  onChange={handleInputChange}
                   className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md"
                 />
               </div>
@@ -127,7 +171,9 @@ export default function AccountSettings() {
                   LAST NAME <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  defaultValue={user?.name?.split(" ")[1] || ""}
+                  name="lastName"
+                  value={profile.lastName}
+                  onChange={handleInputChange}
                   className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md"
                 />
               </div>
@@ -139,9 +185,14 @@ export default function AccountSettings() {
                 <Label className="lv-luxury text-md font-bold text-primary text-sm mb-4 block">
                   COUNTRY / REGION <span className="text-red-500">*</span>
                 </Label>
-                <Select defaultValue="United States">
+                <Select
+                  value={profile.country}
+                  onValueChange={(value) =>
+                    handleInputChange({ target: { name: "country", value } })
+                  }
+                >
                   <SelectTrigger className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md">
-                    <SelectValue />
+                    <SelectValue placeholder="Select country" />
                   </SelectTrigger>
                   <SelectContent className="bg-white rounded-3xl">
                     <SelectItem value="United States">United States</SelectItem>
@@ -160,6 +211,9 @@ export default function AccountSettings() {
                 </Label>
                 <Input
                   type="date"
+                  name="dateOfBirth"
+                  value={profile.dateOfBirth}
+                  onChange={handleInputChange}
                   className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md"
                 />
               </div>
@@ -183,7 +237,8 @@ export default function AccountSettings() {
             <Input
               type="email"
               disabled
-              defaultValue={user?.email || "kthagith09@bestbait.com"}
+              name="email"
+              value={profile.email}
               className="lv-body text-gray-500 font-mono lv-transition h-12 border-2 border-gray-300 focus:border-gray-400 rounded-full px-4 bg-white placeholder:text-gray-400 max-w-md"
             />
           </div>

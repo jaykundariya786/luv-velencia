@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { X } from "lucide-react";
+import { useSizeGuide } from "@/hooks/use-size-guide";
 
 interface SizeGuideModalProps {
   isOpen: boolean;
@@ -12,78 +13,30 @@ interface SizeGuideModalProps {
 
 export default function SizeGuideModal({ isOpen, onClose, category = "mens" }: SizeGuideModalProps) {
   const [activeTab, setActiveTab] = useState("bottoms");
+  const { data: sizeGuideData, isLoading, error } = useSizeGuide(category);
 
-  const sizeData = {
-    mens: {
-      bottoms: [
-        { size: "XXS", it: "42", us: "26", jeans: "26-29", waist: "67/26.4", hips: "87/34.2" },
-        { size: "XS", it: "44", us: "30", jeans: "30-31", waist: "71/28", hips: "91/35.8" },
-        { size: "S", it: "46", us: "32", jeans: "32-33", waist: "75/29.5", hips: "95/37.4" },
-        { size: "M", it: "48", us: "34", jeans: "34-35", waist: "79/31.1", hips: "99/39" },
-        { size: "L", it: "50", us: "36", jeans: "36-37", waist: "83/32.7", hips: "103/40.5" },
-        { size: "XL", it: "52", us: "38", jeans: "38-39", waist: "87/34.2", hips: "107/42.1" },
-        { size: "XXL", it: "54", us: "40", jeans: "40-41", waist: "91/35.8", hips: "111/43.7" },
-        { size: "XXXL", it: "56", us: "42", jeans: "42-43", waist: "95/37.4", hips: "115/45.3" },
-        { size: "-", it: "58", us: "44", jeans: "44-45", waist: "99/39", hips: "119/46.8" },
-        { size: "-", it: "60", us: "46", jeans: "46", waist: "103/40.5", hips: "123/48.4" },
-        { size: "-", it: "62", us: "48", jeans: "-", waist: "107/42.1", hips: "127/50" },
-        { size: "-", it: "64", us: "50", jeans: "-", waist: "111/43.7", hips: "131/51.6" },
-      ],
-      tops: [
-        { size: "XXS", it: "42", shoulders: "44/17.3", chest: "86/33.8" },
-        { size: "XS", it: "44", shoulders: "45/17.7", chest: "90/35.4" },
-        { size: "S", it: "46", shoulders: "46/18.1", chest: "94/37" },
-        { size: "M", it: "48", shoulders: "47/18.5", chest: "98/38.6" },
-        { size: "L", it: "50", shoulders: "48/18.9", chest: "102/40.2" },
-        { size: "XL", it: "52", shoulders: "49/19.3", chest: "106/41.7" },
-        { size: "XXL", it: "54", shoulders: "50/19.7", chest: "110/43.3" },
-        { size: "XXXL", it: "56", shoulders: "51/20.1", chest: "114/44.9" },
-        { size: "-", it: "58", shoulders: "52/20.5", chest: "118/46.5" },
-        { size: "-", it: "60", shoulders: "53/20.9", chest: "122/48" },
-        { size: "-", it: "62", shoulders: "54/21.3", chest: "126/49.6" },
-        { size: "-", it: "64", shoulders: "55/21.6", chest: "130/51.1" },
-      ],
-    },
-    womens: {
-      bottoms: [
-        { size: "XXS", it: "38", us: "00", jeans: "24", waist: "63/24.8", hips: "83/32.7" },
-        { size: "XS", it: "40", us: "0", jeans: "25", waist: "67/26.4", hips: "87/34.3" },
-        { size: "S", it: "42", us: "2", jeans: "26", waist: "71/28", hips: "91/35.8" },
-        { size: "M", it: "44", us: "6", jeans: "28", waist: "75/29.5", hips: "95/37.4" },
-        { size: "L", it: "46", us: "10", jeans: "30", waist: "79/31.1", hips: "99/39" },
-        { size: "XL", it: "48", us: "12", jeans: "32", waist: "83/32.7", hips: "103/40.5" },
-      ],
-      tops: [
-        { size: "XXS", it: "38", shoulders: "35/13.8", chest: "78/30.7" },
-        { size: "XS", it: "40", shoulders: "36/14.2", chest: "82/32.3" },
-        { size: "S", it: "42", shoulders: "37/14.6", chest: "86/33.9" },
-        { size: "M", it: "44", shoulders: "38/15", chest: "90/35.4" },
-        { size: "L", it: "46", shoulders: "39/15.4", chest: "94/37" },
-        { size: "XL", it: "48", shoulders: "40/15.7", chest: "98/38.6" },
-      ],
-    },
-  };
+  if (isLoading) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 bg-white">
+          <div className="p-8 text-center">Loading size guide...</div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
-  const measuringTips = {
-    general: [
-      "The size charts display sizes based on body measurements.",
-      "Use our measuring tips and refer to the sketches below to determine your size.",
-    ],
-    bottoms: [
-      "Stand straight on a flat surface with your heel against a wall.",
-      "Measure around the narrowest part of your waist.",
-      "Measure around the fullest part of your hips.",
-      "For jeans, refer to the waist measurement in inches.",
-    ],
-    tops: [
-      "Measure across the back from shoulder seam to shoulder seam.",
-      "Measure around the fullest part of your chest.",
-      "Keep the measuring tape parallel to the floor.",
-      "Take measurements over undergarments or close-fitting clothing.",
-    ],
-  };
+  if (error) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 bg-white">
+          <div className="p-8 text-center text-red-600">Failed to load size guide</div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
-  const currentData = sizeData[category];
+  const currentData = sizeGuideData?.sizeData;
+  const measuringTips = sizeGuideData?.measuringTips;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

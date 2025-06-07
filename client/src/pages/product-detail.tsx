@@ -20,6 +20,7 @@ import { useAppDispatch } from "@/hooks/redux";
 import { addItem } from "@/store/slices/shoppingBagSlice";
 import SizeGuideModal from "@/components/size-guide-modal";
 import ProductDetailSkeleton from "@/components/product-detail-skeleton";
+import { useMaterialsCare } from "@/hooks/use-materials-care";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -296,6 +297,9 @@ export default function ProductDetail() {
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
   };
 
+  const { data: materialsCareData, isLoading: isMaterialsLoading } =
+    useMaterialsCare();
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
@@ -423,7 +427,7 @@ export default function ProductDetail() {
           </div>
 
           <div className="space-y-4">
-            <h1 className="lv-body font-mono lv-transition lv-title text-2xl lg:text-3xl font-light text-black leading-tight">
+            <h1 className="lv-body font-mono lv-transition lv-title text-xl lg:text-2xl font-light text-black leading-tight">
               {product.name}
             </h1>
             <div className="text-xl lv-luxury font-bold text-primary">

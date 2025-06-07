@@ -1,13 +1,25 @@
-
-import { useAuth } from '@/contexts/auth-context';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Calendar, Clock, MapPin, User, Phone } from 'lucide-react';
-import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  Plus,
+  Calendar,
+  Clock,
+  MapPin,
+  User,
+  Phone,
+} from "lucide-react";
+import { useState } from "react";
 
 export default function Appointments() {
   const navigate = useNavigate();
@@ -15,71 +27,83 @@ export default function Appointments() {
   const [appointments, setAppointments] = useState([
     {
       id: 1,
-      type: 'Personal Shopping',
-      date: '2025-02-15',
-      time: '2:00 PM',
-      location: 'Gucci Fifth Avenue, New York',
-      stylist: 'Maria Rodriguez',
-      status: 'Confirmed',
-      notes: 'Looking for evening wear collection'
+      type: "Personal Shopping",
+      date: "2025-02-15",
+      time: "2:00 PM",
+      location: "Gucci Fifth Avenue, New York",
+      stylist: "Maria Rodriguez",
+      status: "Confirmed",
+      notes: "Looking for evening wear collection",
     },
     {
       id: 2,
-      type: 'Product Consultation',
-      date: '2025-01-28',
-      time: '11:00 AM',
-      location: 'Gucci SoHo, New York',
-      stylist: 'Alessandro Chen',
-      status: 'Completed',
-      notes: 'Handbag consultation for spring collection'
-    }
+      type: "Product Consultation",
+      date: "2025-01-28",
+      time: "11:00 AM",
+      location: "Gucci SoHo, New York",
+      stylist: "Alessandro Chen",
+      status: "Completed",
+      notes: "Handbag consultation for spring collection",
+    },
   ]);
 
   const [newAppointment, setNewAppointment] = useState({
-    type: '',
-    date: '',
-    time: '',
-    location: '',
-    notes: ''
+    type: "",
+    date: "",
+    time: "",
+    location: "",
+    notes: "",
   });
 
   const appointmentTypes = [
-    'Personal Shopping',
-    'Product Consultation',
-    'Styling Session',
-    'Private Viewing',
-    'Repair Service',
-    'Custom Orders'
+    "Personal Shopping",
+    "Product Consultation",
+    "Styling Session",
+    "Private Viewing",
+    "Repair Service",
+    "Custom Orders",
   ];
 
   const locations = [
-    'Gucci Fifth Avenue, New York',
-    'Gucci SoHo, New York',
-    'Gucci Rodeo Drive, Beverly Hills',
-    'Gucci Michigan Avenue, Chicago',
-    'Gucci Union Square, San Francisco'
+    "Gucci Fifth Avenue, New York",
+    "Gucci SoHo, New York",
+    "Gucci Rodeo Drive, Beverly Hills",
+    "Gucci Michigan Avenue, Chicago",
+    "Gucci Union Square, San Francisco",
   ];
 
   const timeSlots = [
-    '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
-    '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'
+    "9:00 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "1:00 PM",
+    "2:00 PM",
+    "3:00 PM",
+    "4:00 PM",
+    "5:00 PM",
   ];
 
   const handleBookAppointment = () => {
-    if (newAppointment.type && newAppointment.date && newAppointment.time && newAppointment.location) {
+    if (
+      newAppointment.type &&
+      newAppointment.date &&
+      newAppointment.time &&
+      newAppointment.location
+    ) {
       const appointment = {
         id: Date.now(),
         ...newAppointment,
-        status: 'Pending',
-        stylist: 'TBD'
+        status: "Pending",
+        stylist: "TBD",
       };
       setAppointments([appointment, ...appointments]);
       setNewAppointment({
-        type: '',
-        date: '',
-        time: '',
-        location: '',
-        notes: ''
+        type: "",
+        date: "",
+        time: "",
+        location: "",
+        notes: "",
       });
       setShowBookingForm(false);
     }
@@ -87,16 +111,16 @@ export default function Appointments() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Confirmed':
-        return 'bg-green-100 text-green-800';
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Completed':
-        return 'bg-gray-100 text-gray-800';
-      case 'Cancelled':
-        return 'bg-red-100 text-red-800';
+      case "Confirmed":
+        return "bg-green-100 text-green-800";
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "Completed":
+        return "bg-gray-100 text-gray-800";
+      case "Cancelled":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -106,37 +130,35 @@ export default function Appointments() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <Button
-              onClick={() => navigate('/account')}
-              variant="ghost"
-              size="sm"
-              className="p-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <h1 className="text-2xl font-light uppercase tracking-wider text-black">
+            <h1 className="text-3xl md:text-5xl lv-luxury text-primary lv-fade-in tracking-[0.2em] drop-shadow-2xl">
               My Appointments
             </h1>
           </div>
-          <Button
-            onClick={() => setShowBookingForm(true)}
-            className="bg-black text-white hover:bg-gray-800"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Book Appointment
-          </Button>
         </div>
+
+        <Button
+          onClick={() => navigate("/account")}
+          variant="ghost"
+          size="sm"
+          className="p-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
 
         {/* Book Appointment Form */}
         {showBookingForm && (
           <div className="bg-gray-50 rounded-lg p-6 mb-8">
-            <h2 className="text-lg font-medium text-black mb-6">Book New Appointment</h2>
+            <h2 className="text-lg font-medium text-black mb-6">
+              Book New Appointment
+            </h2>
             <div className="space-y-6">
               <div>
                 <Label htmlFor="appointment-type">Service Type</Label>
                 <Select
                   value={newAppointment.type}
-                  onValueChange={(value) => setNewAppointment(prev => ({ ...prev, type: value }))}
+                  onValueChange={(value) =>
+                    setNewAppointment((prev) => ({ ...prev, type: value }))
+                  }
                 >
                   <SelectTrigger className="mt-2">
                     <SelectValue placeholder="Select service type" />
@@ -150,7 +172,7 @@ export default function Appointments() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label htmlFor="date">Preferred Date</Label>
@@ -158,7 +180,12 @@ export default function Appointments() {
                     id="date"
                     type="date"
                     value={newAppointment.date}
-                    onChange={(e) => setNewAppointment(prev => ({ ...prev, date: e.target.value }))}
+                    onChange={(e) =>
+                      setNewAppointment((prev) => ({
+                        ...prev,
+                        date: e.target.value,
+                      }))
+                    }
                     className="mt-2"
                   />
                 </div>
@@ -166,7 +193,9 @@ export default function Appointments() {
                   <Label htmlFor="time">Preferred Time</Label>
                   <Select
                     value={newAppointment.time}
-                    onValueChange={(value) => setNewAppointment(prev => ({ ...prev, time: value }))}
+                    onValueChange={(value) =>
+                      setNewAppointment((prev) => ({ ...prev, time: value }))
+                    }
                   >
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select time" />
@@ -186,7 +215,9 @@ export default function Appointments() {
                 <Label htmlFor="location">Store Location</Label>
                 <Select
                   value={newAppointment.location}
-                  onValueChange={(value) => setNewAppointment(prev => ({ ...prev, location: value }))}
+                  onValueChange={(value) =>
+                    setNewAppointment((prev) => ({ ...prev, location: value }))
+                  }
                 >
                   <SelectTrigger className="mt-2">
                     <SelectValue placeholder="Select store location" />
@@ -207,14 +238,22 @@ export default function Appointments() {
                   id="notes"
                   placeholder="Any specific requests or preferences..."
                   value={newAppointment.notes}
-                  onChange={(e) => setNewAppointment(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e) =>
+                    setNewAppointment((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
                   className="mt-2"
                 />
               </div>
             </div>
-            
+
             <div className="flex gap-3 mt-6">
-              <Button onClick={handleBookAppointment} className="bg-black text-white hover:bg-gray-800">
+              <Button
+                onClick={handleBookAppointment}
+                className="bg-black text-white hover:bg-gray-800"
+              >
                 Book Appointment
               </Button>
               <Button
@@ -231,24 +270,38 @@ export default function Appointments() {
         {/* Appointments List */}
         <div className="space-y-6">
           {appointments.map((appointment) => (
-            <div key={appointment.id} className="border border-gray-200 rounded-lg p-6">
+            <div
+              key={appointment.id}
+              className="border border-gray-200 rounded-lg p-6"
+            >
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-medium text-black text-lg">{appointment.type}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
+                    <h3 className="font-medium text-black text-lg">
+                      {appointment.type}
+                    </h3>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                        appointment.status
+                      )}`}
+                    >
                       {appointment.status}
                     </span>
                   </div>
                   <div className="space-y-2 text-gray-600">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      <span>{new Date(appointment.date).toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}</span>
+                      <span>
+                        {new Date(appointment.date).toLocaleDateString(
+                          "en-US",
+                          {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
@@ -258,7 +311,7 @@ export default function Appointments() {
                       <MapPin className="w-4 h-4" />
                       <span>{appointment.location}</span>
                     </div>
-                    {appointment.stylist !== 'TBD' && (
+                    {appointment.stylist !== "TBD" && (
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4" />
                         <span>Stylist: {appointment.stylist}</span>
@@ -267,19 +320,27 @@ export default function Appointments() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {appointment.status === 'Confirmed' && (
-                    <Button variant="outline" size="sm" className="border-black text-black hover:bg-gray-50">
+                  {appointment.status === "Confirmed" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-black text-black hover:bg-gray-50"
+                    >
                       Reschedule
                     </Button>
                   )}
-                  {appointment.status !== 'Completed' && (
-                    <Button variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50">
+                  {appointment.status !== "Completed" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-red-300 text-red-600 hover:bg-red-50"
+                    >
                       Cancel
                     </Button>
                   )}
                 </div>
               </div>
-              
+
               {appointment.notes && (
                 <div className="bg-gray-50 rounded-lg p-4 mt-4">
                   <p className="text-sm text-gray-700">
@@ -295,7 +356,9 @@ export default function Appointments() {
         {appointments.length === 0 && (
           <div className="text-center py-12">
             <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-black mb-2">No appointments scheduled</h3>
+            <h3 className="text-lg font-medium text-black mb-2">
+              No appointments scheduled
+            </h3>
             <p className="text-gray-600 mb-6">
               Book a personal shopping session or consultation with our experts.
             </p>

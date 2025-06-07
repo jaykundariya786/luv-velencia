@@ -1,4 +1,3 @@
-import { useAppSelector } from "@/hooks/redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,36 +9,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, MapPin, Edit, Trash2, X, Check } from "lucide-react";
-import { useState } from "react";
+import {
+  ArrowLeft,
+  Plus,
+  Edit2,
+  Trash2,
+  MapPin,
+  Home,
+  Building,
+  X,
+  Edit,
+  Check,
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  getUserAddresses,
+  addUserAddress,
+  updateUserAddress,
+  deleteUserAddress,
+} from "@/services/api";
 
 export default function Addresses() {
   const navigate = useNavigate();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      type: "Home",
-      name: "John Doe",
-      street: "123 Main Street",
-      city: "New York",
-      state: "NY",
-      zipCode: "10001",
-      country: "United States",
-      isDefault: true,
-    },
-    {
-      id: 2,
-      type: "Work",
-      name: "John Doe",
-      street: "456 Business Ave",
-      city: "New York",
-      state: "NY",
-      zipCode: "10002",
-      country: "United States",
-      isDefault: false,
-    },
-  ]);
+  const [addresses, setAddresses] = useState([]);
 
   const [editingAddress, setEditingAddress] = useState<number | null>(null);
   const [editFormData, setEditFormData] = useState({
@@ -62,33 +55,55 @@ export default function Addresses() {
     country: "United States",
   });
 
-  const handleAddAddress = () => {
-    if (newAddress.name && newAddress.street && newAddress.city) {
-      const address = {
-        id: Date.now(),
-        ...newAddress,
-        isDefault: addresses.length === 0,
-      };
-      setAddresses([...addresses, address]);
-      setNewAddress({
-        type: "",
-        name: "",
-        street: "",
-        city: "",
-        state: "",
-        zipCode: "",
-        country: "United States",
-      });
-      setShowAddForm(false);
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+
+  const fetchAddresses = async () => {
+    try {
+      const data = await getUserAddresses();
+      setAddresses(data);
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
     }
   };
 
-  const handleDeleteAddress = (id: number) => {
+  const handleAddAddress = async () => {
+    if (newAddress.name && newAddress.street && newAddress.city) {
+      try {
+        const address = {
+          ...newAddress,
+          isDefault: addresses.length === 0,
+        };
+        await addUserAddress(address);
+        setNewAddress({
+          type: "",
+          name: "",
+          street: "",
+          city: "",
+          state: "",
+          zipCode: "",
+          country: "United States",
+        });
+        setShowAddForm(false);
+        fetchAddresses(); // Refresh addresses after adding
+      } catch (error) {
+        console.error("Error adding address:", error);
+      }
+    }
+  };
+
+  const handleDeleteAddress = async (id: number) => {
     const addressToDelete = addresses.find((addr) => addr.id === id);
     const confirmMessage = `Are you sure you want to delete the ${addressToDelete?.type} address?\n\nThis action cannot be undone.`;
 
     if (window.confirm(confirmMessage)) {
-      setAddresses(addresses.filter((addr) => addr.id !== id));
+      try {
+        await deleteUserAddress(id);
+        fetchAddresses(); // Refresh addresses after deleting
+      } catch (error) {
+        console.error("Error deleting address:", error);
+      }
     }
   };
 
@@ -108,28 +123,29 @@ export default function Addresses() {
     }
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (
       editFormData.name &&
       editFormData.street &&
       editFormData.city &&
       editingAddress
     ) {
-      setAddresses(
-        addresses.map((addr) =>
-          addr.id === editingAddress ? { ...addr, ...editFormData } : addr
-        )
-      );
-      setEditingAddress(null);
-      setEditFormData({
-        type: "",
-        name: "",
-        street: "",
-        city: "",
-        state: "",
-        zipCode: "",
-        country: "United States",
-      });
+      try {
+        await updateUserAddress(editingAddress, editFormData);
+        setEditingAddress(null);
+        setEditFormData({
+          type: "",
+          name: "",
+          street: "",
+          city: "",
+          state: "",
+          zipCode: "",
+          country: "United States",
+        });
+        fetchAddresses(); // Refresh addresses after editing
+      } catch (error) {
+        console.error("Error updating address:", error);
+      }
     }
   };
 
@@ -146,13 +162,17 @@ export default function Addresses() {
     });
   };
 
-  const setDefaultAddress = (id: number) => {
-    setAddresses(
-      addresses.map((addr) => ({
+  const setDefaultAddress = async (id: number) => {
+    try {
+      const updatedAddresses = addresses.map((addr) => ({
         ...addr,
         isDefault: addr.id === id,
-      }))
-    );
+      }));
+      setAddresses(updatedAddresses);
+      fetchAddresses();
+    } catch (error) {
+      console.error("Error setting default address:", error);
+    }
   };
 
   return (
@@ -246,7 +266,7 @@ export default function Addresses() {
                           className="p-2 hover:bg-blue-50 rounded-full hover:text-blue-700 border border-blue-200"
                           title="Edit address"
                         >
-                          <Edit className="w-4 h-4 text-blue-700" />
+                          <Edit2 className="w-4 h-4 text-blue-700" />
                         </Button>
                         <Button
                           onClick={() => handleDeleteAddress(address.id)}

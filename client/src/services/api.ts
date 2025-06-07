@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 import { type Product } from '@shared/schema';
 import { logout } from '../store/slices/authSlice';
@@ -15,11 +14,11 @@ api.interceptors.request.use(
   (config) => {
     const state = store.getState();
     const user = state.auth.user;
-    
+
     if (user?.token) {
       config.headers.Authorization = `Bearer ${user.token}`;
     }
-    
+
     return config;
   },
   (error) => {
@@ -157,7 +156,7 @@ export const productsAPI = {
     materials?: string[];
   }): Promise<Product[]> => {
     const params = new URLSearchParams();
-    
+
     if (filters?.category) params.append("category", filters.category);
     if (filters?.line) params.append("line", filters.line);
     if (filters?.sort) params.append("sort", filters.sort);
@@ -171,7 +170,7 @@ export const productsAPI = {
 
     const queryString = params.toString();
     const url = `/products${queryString ? `?${queryString}` : ""}`;
-    
+
     return api.get(url);
   },
 
@@ -186,6 +185,153 @@ export const productsAPI = {
   getRecentlyViewed: async (): Promise<Product[]> => {
     return api.get('/recently-viewed');
   },
+};
+
+// Materials and Care API
+export const materialsCareAPI = {
+  getMaterialsCare: async (): Promise<Array<{
+    id: string;
+    title: string;
+    content: string;
+  }>> => {
+    return api.get('/materials-care');
+  },
+
+  getMaterialsCareById: async (id: string): Promise<{
+    id: string;
+    title: string;
+    content: string;
+  }> => {
+    return api.get(`/materials-care/${id}`);
+  },
+};
+
+export const getSizeGuide = async (category: 'mens' | 'womens') => {
+  const response = await fetch(`/api/size-guide/${category}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch size guide data');
+  }
+  return response.json();
+};
+
+export const getSearchSuggestions = async () => {
+  const response = await fetch('/api/search-suggestions');
+  if (!response.ok) {
+    throw new Error('Failed to fetch search suggestions');
+  }
+  return response.json();
+};
+
+// Get saved items
+export const getSavedItems = async () => {
+  const response = await fetch("/api/saved-items");
+  if (!response.ok) {
+    throw new Error("Failed to fetch saved items");
+  }
+  return response.json();
+};
+
+// Remove saved item
+export const removeSavedItem = async (id: number) => {
+  const response = await fetch(`/api/saved-items/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to remove saved item");
+  }
+  return response.json();
+};
+
+// Get user profile
+export const getUserProfile = async () => {
+  const response = await fetch("/api/user/profile");
+  if (!response.ok) {
+    throw new Error("Failed to fetch user profile");
+  }
+  return response.json();
+};
+
+// Update user profile
+export const updateUserProfile = async (profileData: any) => {
+  const response = await fetch("/api/user/profile", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(profileData),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to update user profile");
+  }
+  return response.json();
+};
+
+// Get user orders
+export const getUserOrders = async () => {
+  const response = await fetch("/api/user/orders");
+  if (!response.ok) {
+    throw new Error("Failed to fetch user orders");
+  }
+  return response.json();
+};
+
+// Get user addresses
+export const getUserAddresses = async () => {
+  const response = await fetch("/api/user/addresses");
+  if (!response.ok) {
+    throw new Error("Failed to fetch user addresses");
+  }
+  return response.json();
+};
+
+// Add user address
+export const addUserAddress = async (addressData: any) => {
+  const response = await fetch("/api/user/addresses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(addressData),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to add user address");
+  }
+  return response.json();
+};
+
+// Update user address
+export const updateUserAddress = async (id: number, addressData: any) => {
+  const response = await fetch(`/api/user/addresses/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(addressData),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to update user address");
+  }
+  return response.json();
+};
+
+// Delete user address
+export const deleteUserAddress = async (id: number) => {
+  const response = await fetch(`/api/user/addresses/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete user address");
+  }
+  return response.json();
+};
+
+// Get account menu data
+export const getAccountMenu = async () => {
+  const response = await fetch("/api/account-menu");
+  if (!response.ok) {
+    throw new Error("Failed to fetch account menu");
+  }
+  return response.json();
 };
 
 export default api;

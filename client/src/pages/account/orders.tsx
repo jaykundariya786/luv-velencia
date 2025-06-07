@@ -1,18 +1,9 @@
 import { useAppSelector } from "@/hooks/redux";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  Package,
-  Truck,
-  CheckCircle,
-  Clock,
-  Eye,
-  RotateCcw,
-  Download,
-  Star,
-} from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Package, Calendar, Truck, CheckCircle, Clock, MapPin, RotateCcw, Eye, Download, Star } from "lucide-react";
+import { useState, useEffect } from "react";
+import { getUserOrders } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Orders() {
@@ -20,9 +11,37 @@ export default function Orders() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [trackingOrder, setTrackingOrder] = useState<string | null>(null);
+  const [orders, setOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (user) {
+        try {
+          const ordersData = await getUserOrders(user.id);
+          setOrders(ordersData);
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+          toast({
+            title: "Error",
+            description: "Failed to fetch orders. Please try again later.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to view your orders.",
+          variant: "destructive",
+        });
+        navigate("/login");
+      }
+    };
+
+    fetchOrders();
+  }, [user, navigate, toast]);
 
   // Mock order data with enhanced details
-  const orders = [
+  /* const orders = [
     {
       id: "LV-001234",
       date: "2025-01-15",
@@ -89,7 +108,7 @@ export default function Orders() {
         },
       ],
     },
-  ];
+  ]; */
 
   const getStatusIcon = (status: string) => {
     switch (status) {

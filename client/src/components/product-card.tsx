@@ -124,7 +124,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <h3 className="lv-body text-sm font-mono text-foreground tracking-wide line-clamp-1">
           {product.name}
         </h3>
-        <p className="lv-body text-primary lv-luxury font-bold text-black text-sm">
+        <p className="lv-body text-primary lv-luxury font-bold text-sm">
           {formatPrice(product.price)}
         </p>
         <a

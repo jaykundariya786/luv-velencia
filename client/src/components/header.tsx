@@ -23,6 +23,7 @@ import AccountModal from "./account-modal";
 import { useAppSelector, useAppDispatch } from "@/hooks/redux";
 import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
+import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
 
 // MobileMenu Component
 interface MobileMenuProps {
@@ -150,6 +151,7 @@ function MobileMenu({
 
 function SearchOverlay({ isOpen, onClose, onSearch }: SearchOverlayProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const { data: suggestions, isLoading } = useSearchSuggestions();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -195,74 +197,69 @@ function SearchOverlay({ isOpen, onClose, onSearch }: SearchOverlayProps) {
         </form>
 
         <div className="space-y-6">
-          <div>
-            <h3 className="lv-luxury text-md font-bold text-black mb-3">
-              TRENDING SEARCHES
-            </h3>
-            <div className="space-y-2">
-              <button
-                onClick={() => handleTrendingClick("Handbags")}
-                className="flex text-xs items-center lv-body text-gray-500 hover:text-black font-mono lv-transition"
-              >
-                <Search className="w-3 h-3 mr-3" />
-                Shirt
-              </button>
-              <button
-                onClick={() => handleTrendingClick("Shoes")}
-                className="flex text-xs items-center lv-body text-gray-500 hover:text-black font-mono lv-transition"
-              >
-                <Search className="w-3 h-3 mr-3" />
-                Pant
-              </button>
-              <button
-                onClick={() => handleTrendingClick("Belts")}
-                className="flex text-xs items-center lv-body text-gray-500 hover:text-black font-mono lv-transition"
-              >
-                <Search className="w-3 h-3 mr-3" />
-                T-shirt
-              </button>
-            </div>
-          </div>
+          {isLoading ? (
+            <div className="text-center py-4">Loading suggestions...</div>
+          ) : (
+            <>
+              <div>
+                <h3 className="lv-luxury text-md font-bold text-black mb-3">
+                  TRENDING SEARCHES
+                </h3>
+                <div className="space-y-2">
+                  {suggestions?.trending?.map((item: any, index: number) => (
+                    <button
+                      key={index}
+                      onClick={() => handleTrendingClick(item.query)}
+                      className="flex text-xs items-center lv-body text-gray-500 hover:text-black font-mono lv-transition"
+                    >
+                      <Search className="w-3 h-3 mr-3" />
+                      {item.query}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-          <div>
-            <h3 className="lv-luxury text-md font-bold text-black mb-3">
-              NEW IN
-            </h3>
-            <div className="space-y-2">
-              <button
-                onClick={() => handleTrendingClick("Gucci Giallo")}
-                className="flex text-xs items-center lv-body text-gray-500 hover:text-black font-mono lv-transition"
-              >
-                Giallo
-              </button>
-              <button
-                onClick={() => handleTrendingClick("Women")}
-                className="flex text-xs items-center lv-body text-gray-500 hover:text-black font-mono lv-transition"
-              >
-                Women
-              </button>
-            </div>
-          </div>
+              <div>
+                <h3 className="lv-luxury text-md font-bold text-black mb-3">
+                  NEW IN
+                </h3>
+                <div className="space-y-2">
+                  {suggestions?.newIn?.map((item: any, index: number) => (
+                    <button
+                      key={index}
+                      onClick={() => handleTrendingClick(item.query)}
+                      className="flex text-xs items-center lv-body text-gray-500 hover:text-black font-mono lv-transition"
+                    >
+                      {item.query}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-          <div>
-            <h3 className="lv-luxury text-md font-bold text-black mb-3">
-              FIND THE PERFECT SUMMER STYLE
-            </h3>
-            <div className="space-y-2">
-              <button
-                onClick={() => handleTrendingClick("Gucci Lido Collection")}
-                className="flex text-xs items-center lv-body text-gray-500 hover:text-black font-mono lv-transition"
-              >
-                Lido Collection
-              </button>
-              <a
-                href="#"
-                className="flex text-xs items-center lv-body text-gray-500 hover:text-black font-mono lv-transition"
-              >
-                Personalization
-              </a>
-            </div>
-          </div>
+              <div>
+                <h3 className="lv-luxury text-md font-bold text-black mb-3">
+                  FIND THE PERFECT SUMMER STYLE
+                </h3>
+                <div className="space-y-2">
+                  {suggestions?.featured?.map((item: any, index: number) => (
+                    <button
+                      key={index}
+                      onClick={() => handleTrendingClick(item.query)}
+                      className="flex text-xs items-center lv-body text-gray-500 hover:text-black font-mono lv-transition"
+                    >
+                      {item.query}
+                    </button>
+                  ))}
+                  <a
+                    href="#"
+                    className="flex text-xs items-center lv-body text-gray-500 hover:text-black font-mono lv-transition"
+                  >
+                    Personalization
+                  </a>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -333,7 +330,7 @@ export default function Header({
             </div>
             <Menu
               onClick={onMobileMenuToggle}
-              className="h-4 w-4 sm:h-5 sm:w-5 hidden md:block text-white cursor-pointer hover:text-black/20 lv-transition"
+              className="h-4 w-4 sm:h-5 sm:w-5 md:block text-white cursor-pointer hover:text-black/20 lv-transition"
             />
           </div>
         </div>
