@@ -6,6 +6,8 @@ interface User {
   name: string;
   provider: 'email' | 'google' | 'apple';
   token?: string;
+  firebaseUID?: string;
+  photoURL?: string;
 }
 
 interface AuthState {
@@ -73,6 +75,15 @@ const authSlice = createSlice({
         state.user = storedUser;
       }
     },
+    setAuthState: (state, action: PayloadAction<{ user: User | null; isLoading: boolean }>) => {
+      state.user = action.payload.user;
+      state.isLoading = action.payload.isLoading;
+      if (action.payload.user) {
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
+      } else {
+        localStorage.removeItem('user');
+      }
+    },
   },
 });
 
@@ -83,7 +94,8 @@ export const {
   logout, 
   clearError, 
   updateUser,
-  loadUserFromStorage: loadUserFromStorageAction
+  loadUserFromStorage: loadUserFromStorageAction,
+  setAuthState
 } = authSlice.actions;
 
 // Export login action for header component

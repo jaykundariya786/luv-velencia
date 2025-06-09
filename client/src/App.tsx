@@ -1,4 +1,3 @@
-
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,12 +12,16 @@ import SignIn from "./pages/sign-in";
 import Account from "./pages/account";
 import SearchResults from "./pages/search-results";
 import Footer from "@/components/footer";
-import BookAppointment from '@/pages/book-appointment';
+import BookAppointment from './pages/book-appointment';
+import { useFirebaseAuth } from "@/hooks/use-firebase-auth";
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [cookieNoticeVisible, setCookieNoticeVisible] = useState(true);
+
+  // Initialize Firebase auth
+  useFirebaseAuth();
 
   return (
     <TooltipProvider>

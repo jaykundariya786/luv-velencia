@@ -26,6 +26,7 @@ import { useAppSelector, useAppDispatch } from "@/hooks/redux";
 import { RootState } from "@/store";
 import { login, logout } from "@/store/slices/authSlice";
 import { useToast } from "@/hooks/use-toast";
+import { useFirebaseAuth } from "@/hooks/use-firebase-auth";
 
 interface AccountModalProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
   const dispatch = useAppDispatch();
   const { user, isLoading } = useAppSelector((state: RootState) => state.auth);
   const { toast } = useToast();
+  const { signInWithGoogle, signInWithApple, signOut } = useFirebaseAuth();
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [showWalletModal, setShowWalletModal] = useState(false);
@@ -91,62 +93,30 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
 
   const handleGoogleLogin = async () => {
     try {
-      const mockUser = {
-        id: "google_" + Date.now().toString(),
-        email: "user@gmail.com",
-        name: "Google User",
-        provider: "google" as const,
-      };
-
-      dispatch(login(mockUser));
-
-      toast({
-        title: "Signed in with Google",
-        description: "Welcome!",
-      });
+      await signInWithGoogle();
       onClose();
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Google sign-in failed",
-        description: "Please try again.",
-      });
+      console.error('Google sign-in error:', error);
     }
   };
 
   const handleAppleLogin = async () => {
     try {
-      const mockUser = {
-        id: "apple_" + Date.now().toString(),
-        email: "user@icloud.com",
-        name: "Apple User",
-        provider: "apple" as const,
-      };
-
-      dispatch(login(mockUser));
-
-      toast({
-        title: "Signed in with Apple",
-        description: "Welcome!",
-      });
+      await signInWithApple();
       onClose();
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Apple sign-in failed",
-        description: "Please try again.",
-      });
+      console.error('Apple sign-in error:', error);
     }
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/");
-    onClose();
-    toast({
-      title: "Signed out successfully",
-      description: "Come back soon!",
-    });
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate("/");
+      onClose();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const handleNavigation = (path: string) => {
@@ -271,7 +241,7 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
               <div className="border-t border-gray-200 my-4"></div>
 
               <button
-                onClick={handleLogout}
+                onClick={() => handleLogout()}
                 className="w-full flex items-center gap-3 p-3 text-left hover:bg-red-50 rounded-xl lv-transition"
               >
                 <LogOut className="w-4 h-4" />
@@ -313,7 +283,12 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                     GOOGLE
                   </div>
                 </Button>
-
+                {/* Divider */}
+                <div className="text-center">
+                  <span className="text-xs text-gray-500 bg-white px-4">
+                    OR
+                  </span>
+                </div>
                 <Button
                   onClick={handleAppleLogin}
                   variant="outline"
@@ -331,69 +306,6 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                     APPLE
                   </div>
                 </Button>
-              </div>
-
-              {/* Divider */}
-              <div className="text-center">
-                <span className="text-xs text-gray-500 bg-white px-4">OR</span>
-              </div>
-
-              {/* Email Form */}
-              <form onSubmit={handleSubmit} className="space-y-3">
-                {isSignUp && (
-                  <Input
-                    type="text"
-                    placeholder="Full Name*"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="h-10 bg-gray-50 rounded-full px-4 border-0 placeholder:text-gray-500 text-sm"
-                    required
-                  />
-                )}
-
-                <Input
-                  type="email"
-                  placeholder="Email*"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="h-10 bg-gray-50 rounded-full px-4 border-0 placeholder:text-gray-500 text-sm"
-                  required
-                />
-
-                <Input
-                  type="password"
-                  placeholder="Password*"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  className="h-10 bg-gray-50 rounded-full px-4 border-0 placeholder:text-gray-500 text-sm"
-                  required
-                />
-
-                <Button
-                  type="submit"
-                  className="w-full bg-primary lv-luxury rounded-full text-md font-bold text-primary text-white hover:shadow-xl transition-all duration-300 h-10 text-xs"
-                  disabled={isLoading}
-                >
-                  {isSignUp ? "CREATE ACCOUNT" : "SIGN IN"}
-                </Button>
-              </form>
-
-              {/* Toggle Sign Up/Sign In */}
-              <div className="text-center">
-                <button
-                  onClick={() => setIsSignUp(!isSignUp)}
-                  className="text-xs text-gray-600 hover:text-black underline"
-                >
-                  {isSignUp
-                    ? "Already have an account? Sign in"
-                    : "Don't have an account? Sign up"}
-                </button>
               </div>
             </div>
           )}
@@ -464,7 +376,7 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                               >
                                 {month.toString().padStart(2, "0")}
                               </SelectItem>
-                            )
+                            ),
                           )}
                         </SelectContent>
                       </Select>
@@ -486,7 +398,7 @@ export default function AccountModal({ isOpen, onClose }: AccountModalProps) {
                         <SelectContent>
                           {Array.from(
                             { length: 10 },
-                            (_, i) => new Date().getFullYear() + i
+                            (_, i) => new Date().getFullYear() + i,
                           ).map((year) => (
                             <SelectItem key={year} value={year.toString()}>
                               {year}

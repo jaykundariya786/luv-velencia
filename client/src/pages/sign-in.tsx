@@ -1,11 +1,11 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { setLoading, loginSuccess, loginFailure } from '@/store/slices/authSlice';
-import { authAPI } from '@/services/api';
+import { useFirebaseAuth } from '@/hooks/use-firebase-auth';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SignIn() {
@@ -13,7 +13,8 @@ export default function SignIn() {
   const location = useLocation();
   const { toast } = useToast();
   const dispatch = useAppDispatch();
-  const { isLoading } = useAppSelector((state) => state.auth);
+  const { user, isLoading } = useAppSelector((state) => state.auth);
+  const { signInWithGoogle } = useFirebaseAuth();
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
@@ -24,84 +25,38 @@ export default function SignIn() {
 
   const from = location.state?.from?.pathname || '/';
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, from]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(setLoading(true));
-
-    try {
-      let user;
-      if (isSignUp) {
-        user = await authAPI.signup(formData.email, formData.password, formData.name);
-      } else {
-        user = await authAPI.login(formData.email, formData.password);
-      }
-
-      dispatch(loginSuccess(user));
-
-      toast({
-        title: isSignUp ? "Account created successfully" : "Signed in successfully",
-        description: isSignUp ? "Welcome to LUV VELENCIA!" : "Welcome back!"
-      });
-
-      navigate(from, { replace: true });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
-      dispatch(loginFailure(errorMessage));
-      
-      toast({
-        variant: "destructive",
-        title: isSignUp ? "Signup failed" : "Login failed",
-        description: errorMessage
-      });
-    }
+    toast({
+      title: "Email Authentication Coming Soon",
+      description: "Please use Google sign-in for now. Email authentication will be available soon."
+    });
   };
 
   const handleGoogleLogin = async () => {
-    dispatch(setLoading(true));
-
     try {
-      const user = await authAPI.loginWithGoogle();
-      dispatch(loginSuccess(user));
-
+      await signInWithGoogle();
       toast({
         title: "Signed in with Google",
-        description: "Welcome!"
+        description: "Welcome to LUV VELENCIA!"
       });
-      navigate(from, { replace: true });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Google sign-in failed';
-      dispatch(loginFailure(errorMessage));
-      
-      toast({
-        variant: "destructive",
-        title: "Google sign-in failed",
-        description: errorMessage
-      });
+      console.error('Google sign-in error:', error);
     }
   };
 
   const handleAppleLogin = async () => {
-    dispatch(setLoading(true));
-
-    try {
-      const user = await authAPI.loginWithApple();
-      dispatch(loginSuccess(user));
-
-      toast({
-        title: "Signed in with Apple",
-        description: "Welcome!"
-      });
-      navigate(from, { replace: true });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Apple sign-in failed';
-      dispatch(loginFailure(errorMessage));
-      
-      toast({
-        variant: "destructive",
-        title: "Apple sign-in failed",
-        description: errorMessage
-      });
-    }
+    toast({
+      title: "Apple Sign-In Coming Soon",
+      description: "Apple authentication will be available in a future update."
+    });
   };
 
   return (

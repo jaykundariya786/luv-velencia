@@ -1,5 +1,24 @@
 import { products, savedItems, type Product, type InsertProduct, type SavedItem, type InsertSavedItem, type CategoryFilter, type LineFilter, type SortOption } from "@shared/schema";
 
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  provider: 'email' | 'google' | 'apple';
+  firebaseUID?: string;
+  photoURL?: string;
+  lastLogin?: string;
+  createdAt: string;
+}
+
+interface InsertUser {
+  email: string;
+  name: string;
+  provider: 'email' | 'google' | 'apple';
+  firebaseUID?: string;
+  photoURL?: string;
+}
+
 export interface IStorage {
   getProducts(filters?: {
     category?: CategoryFilter;
@@ -14,21 +33,28 @@ export interface IStorage {
   isItemSaved(sessionId: string, productId: number): Promise<boolean>;
   addRecentlyViewed(sessionId: string, productId: number): Promise<void>;
   getRecentlyViewed(sessionId: string): Promise<Product[]>;
+  getUserByFirebaseUID(firebaseUID: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  updateUser(id: string, updates: Partial<User>): Promise<User>;
 }
 
 export class MemStorage implements IStorage {
   private products: Map<number, Product>;
   private savedItems: Map<string, SavedItem>;
   private recentlyViewed: Map<string, number[]>;
+  private users: Map<string, User>;
   private currentProductId: number;
   private currentSavedId: number;
+  private currentUserId: number;
 
   constructor() {
     this.products = new Map();
     this.savedItems = new Map();
     this.recentlyViewed = new Map();
+    this.users = new Map();
     this.currentProductId = 1;
     this.currentSavedId = 1;
+    this.currentUserId = 1;
     this.seedData();
   }
 
@@ -446,6 +472,42 @@ export class MemStorage implements IStorage {
     }
 
     return products;
+  }
+
+  async getUserByFirebaseUID(firebaseUID: string): Promise<User | undefined> {
+    for (const user of this.users.values()) {
+      if (user.firebaseUID === firebaseUID) {
+        return user;
+      }
+    }
+    return undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = (this.currentUserId++).toString();
+    const user: User = {
+      id,
+      ...insertUser,
+      createdAt: new Date().toISOString(),
+      lastLogin: new Date().toISOString()
+    };
+    this.users.set(id, user);
+    return user;
+  }
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User> {
+    const user = this.users.get(id);
+    if (!user) {
+      throw new Error(`User with id ${id} not found`);
+    }
+    
+    const updatedUser: User = {
+      ...user,
+      ...updates
+    };
+    
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
 }
 
