@@ -1,30 +1,37 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from './hooks/redux';
-import { verifyToken, setInitialized } from './store/slices/authSlice';
-import Layout from './components/Layout';
-import LoadingSpinner from './components/LoadingSpinner';
-import { Toaster } from './components/ui/toaster';
-import { Toaster as HotToaster } from 'react-hot-toast';
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "./hooks/redux";
+import { verifyToken, setInitialized } from "./store/slices/authSlice";
+import Layout from "./components/Layout";
+import LoadingSpinner from "./components/LoadingSpinner";
+import { Toaster } from "./components/ui/toaster";
+import { Toaster as HotToaster } from "react-hot-toast";
 
 // Pages
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Users from './pages/Users';
-import UserDetail from './pages/UserDetail';
-import Products from './pages/Products';
-import ProductForm from './pages/ProductForm';
-import Orders from './pages/Orders';
-import OrderDetail from './pages/OrderDetail';
-import Analytics from './pages/Analytics';
-import Discounts from './pages/Discounts';
-import ContactMessages from './pages/ContactMessages';
-import Notifications from './pages/Notifications';
-import Currency from './pages/Currency';
-import Settings from './pages/Settings'; // Assuming Settings page exists
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Users from "./pages/Users";
+import UserDetail from "./pages/UserDetail";
+import Products from "./pages/Products";
+import ProductForm from "./pages/ProductForm";
+import Orders from "./pages/Orders";
+import OrderDetail from "./pages/OrderDetail";
+import Analytics from "./pages/Analytics";
+import Discounts from "./pages/Discounts";
+import ContactMessages from "./pages/ContactMessages";
+import Notifications from "./pages/Notifications";
+import Currency from "./pages/Currency";
+import Settings from "./pages/Settings"; // Assuming Settings page exists
 
 // Protected Route Component
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
 
   if (loading) {
@@ -48,16 +55,27 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const { token, isInitialized } = useAppSelector((state) => state.auth);
+  const { loading } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    // Check if user has a stored token and verify it
-    if (token) {
-      dispatch(verifyToken());
-    } else {
-      // If no token, mark as initialized
-      dispatch(setInitialized());
+    const initializeAuth = async () => {
+      const token = localStorage.getItem("adminToken");
+      if (token && !isInitialized && !loading) {
+        try {
+          await dispatch(verifyToken());
+        } catch (error) {
+          console.error("Token verification failed:", error);
+          dispatch(setInitialized());
+        }
+      } else if (!token) {
+        dispatch(setInitialized());
+      }
+    };
+
+    if (!isInitialized) {
+      initializeAuth();
     }
-  }, [dispatch, token]);
+  }, [dispatch, isInitialized, loading]);
 
   if (!isInitialized) {
     return <LoadingSpinner />;
@@ -93,7 +111,10 @@ const App: React.FC = () => {
                   <Route path="/orders/:id" element={<OrderDetail />} />
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/discounts" element={<Discounts />} />
-                  <Route path="/contact-messages" element={<ContactMessages />} />
+                  <Route
+                    path="/contact-messages"
+                    element={<ContactMessages />}
+                  />
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/currency" element={<Currency />} />
                   <Route path="/settings" element={<Settings />} />

@@ -75,7 +75,7 @@ export const fetchProducts = createAsyncThunk(
   async (params?: any, { rejectWithValue }) => {
     try {
       const response = await productsAPI.getProducts(params);
-      return response.data;
+      return response.data.data; // Extract data from success response structure
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
     }

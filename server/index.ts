@@ -71,7 +71,7 @@ app.use((req, res, next) => {
 
   // Start server on port 5000
   const port = 5000;
-  const host = "127.0.0.1"; // You can use "127.0.0.1" if you don't want external access
+  const host = "0.0.0.0"; // Use 0.0.0.0 to allow external access
 
   server.listen(port, host, () => {
     log(`serving on http://${host}:${port}`);

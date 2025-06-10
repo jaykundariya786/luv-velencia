@@ -2,7 +2,7 @@
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { logout } from "@/store/slices/authSlice";
 import { Button } from "@/components/ui/button";
-import { useNavigate, Routes, Route } from "react-router-dom";
+import { useLocation, Route, Router } from "wouter";
 import {
   User,
   Settings,
@@ -35,12 +35,12 @@ import { useEffect } from "react";
 function AccountHome() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const { data: menuData, isLoading } = useAccountMenu();
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/");
+    setLocation("/");
   };
 
   // Icon mapping
@@ -145,10 +145,10 @@ function AccountHome() {
         <div className="mb-16">
           <h3 className="text-2xl font-bold text-center mb-8 lv-luxury uppercase tracking-wider">Main Services</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {menuItems.map((item, index) => (
+            {menuItems.map((item: any, index: number) => (
               <div
                 key={index}
-                onClick={() => navigate(item.path)}
+                onClick={() => setLocation(item.path)}
                 className="group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl border border-gray-100"
               >
                 <div className={`absolute inset-0 ${item.bgColor} opacity-30`}></div>
@@ -187,10 +187,10 @@ function AccountHome() {
         <div className="mb-16">
           <h3 className="text-2xl font-bold text-center mb-8 lv-luxury uppercase tracking-wider">Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {quickActions.map((item, index) => (
+            {quickActions.map((item: any, index: number) => (
               <div
                 key={index}
-                onClick={() => navigate(item.path)}
+                onClick={() => setLocation(item.path)}
                 className="group p-6 bg-white border border-gray-200 rounded-2xl hover:border-black/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
               >
                 <div className="flex items-center justify-between">
@@ -228,7 +228,7 @@ function AccountHome() {
               <Button
                 variant="secondary"
                 className="bg-white text-black hover:bg-gray-100 py-4 text-sm font-semibold rounded-full group transition-all duration-300 hover:scale-105"
-                onClick={() => navigate("/products")}
+                onClick={() => setLocation("/products")}
               >
                 <ShoppingBag className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-300" />
                 Continue Shopping
@@ -236,7 +236,7 @@ function AccountHome() {
               <Button
                 variant="secondary"
                 className="bg-white text-black hover:bg-gray-100 py-4 text-sm font-semibold rounded-full group transition-all duration-300 hover:scale-105"
-                onClick={() => navigate("/account/orders")}
+                onClick={() => setLocation("/account/orders")}
               >
                 <Package className="w-4 h-4 mr-2 group-hover:bounce transition-all duration-300" />
                 Track Order
@@ -244,7 +244,7 @@ function AccountHome() {
               <Button
                 variant="secondary"
                 className="bg-white text-black hover:bg-gray-100 py-4 text-sm font-semibold rounded-full group transition-all duration-300 hover:scale-105"
-                onClick={() => navigate("/account/appointments")}
+                onClick={() => setLocation("/account/appointments")}
               >
                 <Calendar className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
                 Book Appointment
@@ -270,29 +270,27 @@ function AccountHome() {
 }
 
 export default function Account() {
-  const navigate = useNavigate();
+  const [location, setLocation] = useLocation();
   const { user } = useAppSelector((state) => state.auth);
 
   // Redirect to sign-in if not authenticated
   useEffect(() => {
     if (!user) {
-      navigate('/sign-in');
+      setLocation('/sign-in');
     }
-  }, [user, navigate]);
+  }, [user, setLocation]);
 
   if (!user) {
     return null;
   }
 
-  return (
-    <Routes>
-      <Route path="/" element={<AccountHome />} />
-      <Route path="/orders" element={<Orders />} />
-      <Route path="/settings" element={<AccountSettings />} />
-      <Route path="/addresses" element={<Addresses />} />
-      <Route path="/wallet" element={<Wallet />} />
-      <Route path="/saved-items" element={<SavedItems />} />
-      <Route path="/appointments" element={<Appointments />} />
-    </Routes>
-  );
+  // Handle nested routing for account pages
+  if (location === '/account/orders') return <Orders />;
+  if (location === '/account/settings') return <AccountSettings />;
+  if (location === '/account/addresses') return <Addresses />;
+  if (location === '/account/wallet') return <Wallet />;
+  if (location === '/account/saved-items') return <SavedItems />;
+  if (location === '/account/appointments') return <Appointments />;
+
+  return <AccountHome />;
 }

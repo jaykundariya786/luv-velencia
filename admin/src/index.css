@@ -1,10 +1,9 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 /* Enhanced CSS Custom Properties with Modern Color Palette */
 :root {
@@ -41,7 +40,7 @@
   --sidebar-border: 240 3.7% 15.9%;
   --sidebar-ring: 217.2 10.6% 64.9%;
   --radius: 0.75rem;
-  
+
   /* Modern Admin Color Scheme */
   --admin-primary: 158 64% 52%; /* Modern emerald */
   --admin-secondary: 210 40% 98%; /* Light gray */
@@ -52,7 +51,7 @@
   --admin-warning: 32 95% 44%;
   --admin-error: 346 87% 43%;
   --admin-info: 221 83% 53%;
-  
+
   /* Enhanced gradient colors */
   --emerald-gradient: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
   --teal-gradient: linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #0f766e 100%);
@@ -567,4 +566,47 @@ body {
 
 .premium-shadow {
   box-shadow: 0 25px 50px rgba(139, 92, 246, 0.2), 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Ensure proper text wrapping on mobile */
+.truncate-mobile {
+  @media (max-width: 640px) {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
+
+/* Mobile-friendly button sizes */
+@media (max-width: 640px) {
+  .btn-mobile {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
 }

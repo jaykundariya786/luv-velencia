@@ -26,7 +26,6 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { getDocuments, createDocument, updateDocument, deleteDocument } from '../lib/firebase';
-import { useAppSelector } from '../hooks/redux';
 
 interface UserData {
   id: string;
@@ -61,50 +60,10 @@ const Users: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // Check if user is authenticated before loading data
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        setError('Please log in to view users');
-        setLoading(false);
-        return;
-      }
-
-      // Get authenticated Firebase users from backend API
-      const response = await fetch('/api/admin/firebase-users', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const backendUsers = data.users.map((user: any) => ({
-          id: user.id,
-          name: user.name || '',
-          email: user.email || '',
-          phone: user.phone || '',
-          role: user.role || 'customer',
-          isActive: user.isActive !== undefined ? user.isActive : true,
-          avatar: user.photoURL || '',
-          joinedDate: user.createdAt || new Date().toISOString().split('T')[0],
-          lastLogin: user.lastLogin || '',
-          location: user.location || '',
-          totalOrders: user.totalOrders || 0,
-          totalSpent: user.totalSpent || 0,
-          status: user.isActive ? 'active' : 'inactive',
-          provider: user.provider || 'email',
-          firebaseUID: user.firebaseUID,
-          isNewUser: user.createdAt && new Date(user.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // New if created in last 7 days
-        }));
-        
-        setUsers(backendUsers);
-        return;
-      }
-
-      // Fallback to Firebase directly if backend fails
+      // Get users from Firebase
       const usersSnapshot = await getDocuments('users');
       const firebaseUsers: UserData[] = [];
-
+      
       usersSnapshot.forEach((doc) => {
         const data = doc.data();
         firebaseUsers.push({
@@ -120,9 +79,7 @@ const Users: React.FC = () => {
           location: data.location || '',
           totalOrders: data.totalOrders || 0,
           totalSpent: data.totalSpent || 0,
-          status: data.status || 'active',
-          provider: data.provider || 'email',
-          isNewUser: data.createdAt && data.createdAt.toDate() > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          status: data.status || 'active'
         });
       });
 
@@ -263,7 +220,7 @@ const Users: React.FC = () => {
                           user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-
+    
     return matchesSearch && matchesStatus && matchesRole;
   });
 
@@ -278,7 +235,7 @@ const Users: React.FC = () => {
       manager: 'bg-blue-100 text-blue-800',
       customer: 'bg-green-100 text-green-800'
     };
-
+    
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[role as keyof typeof styles] || styles.customer}`}>
         {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -292,17 +249,12 @@ const Users: React.FC = () => {
       inactive: 'bg-gray-100 text-gray-800',
       suspended: 'bg-red-100 text-red-800'
     };
-
+    
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status as keyof typeof styles] || styles.active}`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
-  };
-
-  const handleExportUsers = () => {
-    // Implement CSV export logic here
-    toast.success('Exporting users to CSV...');
   };
 
   if (loading) {
@@ -346,28 +298,21 @@ const Users: React.FC = () => {
           <p className="mt-2 text-gray-600">Manage user accounts and permissions</p>
         </div>
         <div className="flex items-center space-x-3">
-            <button
-              onClick={loadUsers}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <RefreshCw className="h-4 w-4" />
-              <span>Refresh</span>
-            </button>
-            <button
-              onClick={handleExportUsers}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Download className="h-4 w-4" />
-              <span>Export CSV</span>
-            </button>
-            <button
-              onClick={() => toast.success('Add User feature coming soon!')}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Add User</span>
-            </button>
-          </div>
+          <button
+            onClick={loadUsers}
+            className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span>Refresh</span>
+          </button>
+          <Link
+            to="/users/new"
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add User</span>
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
@@ -564,29 +509,17 @@ const Users: React.FC = () => {
                         )}
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900 flex items-center">
-                          {user.name}
-                          {user.isNewUser && (
-                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              New
-                            </span>
-                          )}
-                        </div>
+                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
                         <div className="text-sm text-gray-500 flex items-center">
                           <Mail className="h-3 w-3 mr-1" />
                           {user.email}
                         </div>
-                        <div className="text-xs text-gray-400 flex items-center mt-1">
-                          {user.provider && (
-                            <span className="mr-2 capitalize">{user.provider} login</span>
-                          )}
-                          {user.location && (
-                            <>
-                              <MapPin className="h-3 w-3 mr-1" />
-                              {user.location}
-                            </>
-                          )}
-                        </div>
+                        {user.location && (
+                          <div className="text-xs text-gray-400 flex items-center mt-1">
+                            <MapPin className="h-3 w-3 mr-1" />
+                            {user.location}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </td>

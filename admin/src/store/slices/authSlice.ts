@@ -46,7 +46,7 @@ export const verifyToken = createAsyncThunk(
     try {
       const state = getState() as { auth: AuthState };
       if (!state.auth.token) {
-        throw new Error("No token found");
+        return rejectWithValue("No token found");
       }
       
       const response = await authAPI.verifyToken();

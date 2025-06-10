@@ -1,8 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
 import { CategoryFilter, LineFilter, SortOption } from "@shared/schema";
 import { z } from "zod";
+import { storage } from "./storage";
 
 function generateProductDetails(product: any) {
   const category = product.category?.toLowerCase() || "";
@@ -160,7 +160,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const offsetNum = offset ? parseInt(offset as string) : 0;
 
       const result = await storage.getProducts(filters, limitNum, offsetNum);
-      res.json(result);
+      
+      // Ensure each product has the necessary fields for filtering
+      const enhancedProducts = result.products.map((product: any) => ({
+        ...product,
+        category: product.category || 'uncategorized',
+        line: product.line || 'standard',
+        colors: product.colors || '["black"]',
+        materials: product.materials || '["cotton"]',
+        sizes: product.sizes || '["M"]'
+      }));
+      
+      res.json({
+        ...result,
+        products: enhancedProducts
+      });
     } catch (error) {
       console.error("Error fetching products:", error);
       res.status(500).json({ error: "Failed to fetch products" });
@@ -815,7 +829,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  //  // Firebase Authentication
+  // Firebase Authentication
   app.post("/api/auth/firebase-login", async (req, res) => {
     try {
       const { firebaseUID, email, name, photoURL, idToken } = req.body;
@@ -860,6 +874,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to authenticate user" });
     }
   });
+
+  // Mock users data for Firebase users endpoint
+  const mockUsers = [
+    {
+      id: "1",
+      name: "John Doe", 
+      email: "john@example.com",
+      provider: "google",
+      firebaseUID: "firebase_123",
+      photoURL: "https://example.com/photo1.jpg",
+      isActive: true,
+      totalOrders: 12,
+      totalSpent: 15680,
+      lastLogin: "2025-01-15",
+      createdAt: "2024-03-15",
+    },
+    {
+      id: "2", 
+      name: "Jane Smith",
+      email: "jane@example.com", 
+      provider: "google",
+      firebaseUID: "firebase_456",
+      photoURL: "https://example.com/photo2.jpg",
+      isActive: true,
+      totalOrders: 8,
+      totalSpent: 9240,
+      lastLogin: "2025-01-14", 
+      createdAt: "2024-05-20",
+    },
+    {
+      id: "3",
+      name: "Mike Johnson",
+      email: "mike@example.com",
+      provider: "email", 
+      firebaseUID: null,
+      photoURL: null,
+      isActive: false,
+      totalOrders: 3,
+      totalSpent: 2890,
+      lastLogin: "2024-12-28",
+      createdAt: "2024-07-10",
+    }
+  ];
 
   // Admin Firebase Users endpoint
   app.get("/api/admin/firebase-users", async (req, res) => {
@@ -1058,6 +1115,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               : "in-stock",
           sales: Math.floor(Math.random() * 100) + 10,
           inStock: stock > 0,
+          sizes: product.sizes || '[]',
+          colors: product.colors || '[]',
+          materials: product.materials || '[]',
+          images: product.images || JSON.stringify([product.imageUrl]),
+          coverImageIndex: product.coverImageIndex || 0,
+          hasVariants: product.hasVariants || false,
           createdAt: new Date(
             Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000,
           )
@@ -3452,6 +3515,376 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Firebase login error:", error);
       res.status(500).json({ error: "Failed to authenticate user" });
+    }
+  });
+
+  // =============================================
+  // ADMIN API ENDPOINTS
+  // =============================================
+
+  // Admin Authentication
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      // Simple admin validation - in production, use proper auth
+      if (username === "admin" && password === "admin123") {
+        const token = "admin-token-" + Date.now();
+        const user = {
+          id: "admin-1",
+          username: "admin",
+          email: "admin@luvvalencia.com",
+          role: "admin",
+          name: "Admin User"
+        };
+        
+        res.json({
+          success: true,
+          data: { user, token },
+          message: "Login successful"
+        });
+      } else {
+        res.status(401).json({
+          success: false,
+          message: "Invalid credentials"
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Login failed"
+      });
+    }
+  });
+
+  app.get("/api/admin/verify", async (req, res) => {
+    try {
+      const token = req.headers.authorization?.replace("Bearer ", "");
+      
+      if (token && token.startsWith("admin-token-")) {
+        const user = {
+          id: "admin-1",
+          username: "admin",
+          email: "admin@luvvalencia.com",
+          role: "admin",
+          name: "Admin User"
+        };
+        
+        res.json({
+          success: true,
+          data: user
+        });
+      } else {
+        res.status(401).json({
+          success: false,
+          message: "Invalid token"
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Token verification failed"
+      });
+    }
+  });
+
+  app.post("/api/admin/logout", async (req, res) => {
+    try {
+      res.json({
+        success: true,
+        message: "Logout successful"
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Logout failed"
+      });
+    }
+  });
+
+  // Admin Products API
+  app.get("/api/admin/products", async (req, res) => {
+    try {
+      const { page = 1, limit = 12, search, category, status } = req.query;
+      const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
+      
+      const filters: any = {};
+      if (search) filters.search = search;
+      if (category) filters.category = category;
+      
+      const result = await storage.getProducts(filters, parseInt(limit as string), offset);
+      
+      res.json({
+        success: true,
+        data: {
+          products: result.products,
+          total: result.total,
+          page: parseInt(page as string),
+          limit: parseInt(limit as string),
+          totalPages: Math.ceil(result.total / parseInt(limit as string))
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch products"
+      });
+    }
+  });
+
+  app.get("/api/admin/products/:id", async (req, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const product = await storage.getProductById(productId);
+      
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found"
+        });
+      }
+      
+      res.json({
+        success: true,
+        data: product
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch product"
+      });
+    }
+  });
+
+  app.post("/api/admin/products", async (req, res) => {
+    try {
+      const productData = req.body;
+      
+      // Basic validation
+      if (!productData.name || !productData.price || !productData.category) {
+        return res.status(400).json({
+          success: false,
+          message: "Name, price, and category are required"
+        });
+      }
+      
+      const newProduct = await storage.createProduct(productData);
+      
+      res.status(201).json({
+        success: true,
+        data: newProduct,
+        message: "Product created successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to create product"
+      });
+    }
+  });
+
+  app.put("/api/admin/products/:id", async (req, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const updatedProduct = await storage.updateProduct(productId, updates);
+      
+      if (!updatedProduct) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found"
+        });
+      }
+      
+      res.json({
+        success: true,
+        data: updatedProduct,
+        message: "Product updated successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to update product"
+      });
+    }
+  });
+
+  app.delete("/api/admin/products/:id", async (req, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const deleted = await storage.deleteProduct(productId);
+      
+      if (!deleted) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found"
+        });
+      }
+      
+      res.json({
+        success: true,
+        message: "Product deleted successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to delete product"
+      });
+    }
+  });
+
+  app.get("/api/admin/products/categories", async (req, res) => {
+    try {
+      const categories = await storage.getCategories();
+      
+      res.json({
+        success: true,
+        data: categories
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch categories"
+      });
+    }
+  });
+
+  // Admin Orders API
+  app.get("/api/admin/orders", async (req, res) => {
+    try {
+      const { page = 1, limit = 10, status, search } = req.query;
+      const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
+      
+      const orders = await storage.getOrders({
+        status: status as string,
+        search: search as string,
+        limit: parseInt(limit as string),
+        offset
+      });
+      
+      res.json({
+        success: true,
+        data: orders
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch orders"
+      });
+    }
+  });
+
+  app.get("/api/admin/orders/:id", async (req, res) => {
+    try {
+      const order = await storage.getOrderById(req.params.id);
+      
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: "Order not found"
+        });
+      }
+      
+      res.json({
+        success: true,
+        data: order
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch order"
+      });
+    }
+  });
+
+  app.put("/api/admin/orders/:id/status", async (req, res) => {
+    try {
+      const { status, trackingNumber } = req.body;
+      
+      const updatedOrder = await storage.updateOrderStatus(req.params.id, status, trackingNumber);
+      
+      if (!updatedOrder) {
+        return res.status(404).json({
+          success: false,
+          message: "Order not found"
+        });
+      }
+      
+      res.json({
+        success: true,
+        data: updatedOrder,
+        message: "Order status updated successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to update order status"
+      });
+    }
+  });
+
+  // Admin Users API
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      const { page = 1, limit = 10, search } = req.query;
+      const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
+      
+      const users = await storage.getUsers({
+        search: search as string,
+        limit: parseInt(limit as string),
+        offset
+      });
+      
+      res.json({
+        success: true,
+        data: users
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch users"
+      });
+    }
+  });
+
+  app.get("/api/admin/users/:id", async (req, res) => {
+    try {
+      const user = await storage.getUserById(req.params.id);
+      
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found"
+        });
+      }
+      
+      res.json({
+        success: true,
+        data: user
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch user"
+      });
+    }
+  });
+
+  // Admin Analytics API
+  app.get("/api/admin/analytics", async (req, res) => {
+    try {
+      const analytics = await storage.getAnalytics();
+      
+      res.json({
+        success: true,
+        data: analytics
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch analytics"
+      });
     }
   });
 

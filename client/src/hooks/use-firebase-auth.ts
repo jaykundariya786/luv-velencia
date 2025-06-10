@@ -1,156 +1,123 @@
-import { useEffect } from 'react';
+
+import { auth, signInWithGoogle, signInWithApple, signOutUser, onAuthStateChanged } from '@/lib/firebase';
 import { User } from 'firebase/auth';
+import { useState, useEffect } from 'react';
 import { useAppDispatch } from './redux';
-import { auth, onAuthStateChanged, signInWithGoogle, signInWithApple, signOutUser } from '@/lib/firebase';
-import { loginSuccess, logout, setLoading } from '@/store/slices/authSlice';
-import { useToast } from '@/hooks/use-toast';
+import { setUser, clearUser } from '@/store/slices/authSlice';
 
 export const useFirebaseAuth = () => {
+  const [user, setCurrentUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const dispatch = useAppDispatch();
-  const { toast } = useToast();
+
+  // Function to register/update user in backend
+  const registerUserInBackend = async (firebaseUser: User) => {
+    try {
+      const idToken = await firebaseUser.getIdToken();
+
+      const response = await fetch('/api/auth/firebase-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firebaseUID: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: firebaseUser.displayName,
+          photoURL: firebaseUser.photoURL,
+          idToken,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to register user in backend');
+      }
+
+      const userData = await response.json();
+      console.log('User registered/updated in backend:', userData);
+      return userData;
+    } catch (error) {
+      console.error('Error registering user in backend:', error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
-    dispatch(setLoading(true));
-    
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
-      if (firebaseUser) {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('Auth state changed:', user ? `User: ${user.email}` : 'No user');
+      setCurrentUser(user);
+      
+      if (user) {
         try {
-          // Get Firebase ID token
-          const idToken = await firebaseUser.getIdToken();
-          
-          // Send Firebase user data to backend to sync/create user
-          const response = await fetch('/api/auth/firebase-login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              firebaseUID: firebaseUser.uid,
-              email: firebaseUser.email,
-              name: firebaseUser.displayName || firebaseUser.email?.split('@')[0],
-              photoURL: firebaseUser.photoURL,
-              idToken: idToken
-            })
-          });
+          // Register/update user in backend database
+          await registerUserInBackend(user);
 
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Backend sync error:', response.status, errorText);
-            throw new Error(`Failed to sync user with backend: ${response.status}`);
-          }
-
-          const backendUser = await response.json();
-          console.log('User synced with backend:', backendUser);
-
-          // Update Redux with backend user data
-          dispatch(loginSuccess({
-            id: backendUser.id,
-            email: backendUser.email,
-            name: backendUser.name,
-            provider: backendUser.provider || 'google',
-            token: idToken
+          dispatch(setUser({
+            id: user.uid,
+            email: user.email || '',
+            name: user.displayName || '',
+            provider: 'google',
+            firebaseUID: user.uid,
+            photoURL: user.photoURL || '',
           }));
-          
         } catch (error) {
-          console.error('Error syncing user with backend:', error);
-          // Handle error gracefully - user is still authenticated with Firebase
-          // but backend sync failed
+          console.error('Error handling user authentication:', error);
         }
       } else {
-        dispatch(logout());
+        dispatch(clearUser());
       }
-      dispatch(setLoading(false));
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, [dispatch]);
 
-  const handleGoogleSignIn = async () => {
+  const signInGoogle = async () => {
     try {
-      dispatch(setLoading(true));
-      console.log('Starting Google sign-in...');
+      console.log('Initiating Google sign-in...');
+      setLoading(true);
       const result = await signInWithGoogle();
-      console.log('Google sign-in successful:', result);
-      // Auth state change will be handled by the listener above
+      console.log('Google sign-in hook completed successfully');
+      // User registration will be handled automatically by onAuthStateChanged
+      return result;
     } catch (error: any) {
-      dispatch(setLoading(false));
-      console.error('Google sign in error:', error);
-      
-      let errorMessage = "Failed to sign in with Google. Please try again.";
-      
-      if (error.code === 'auth/popup-closed-by-user') {
-        errorMessage = "Sign-in was cancelled.";
-      } else if (error.code === 'auth/popup-blocked') {
-        errorMessage = "Popup was blocked. Please allow popups and try again.";
-      } else if (error.code === 'auth/cancelled-popup-request') {
-        errorMessage = "Another sign-in popup is already open.";
-      } else if (error.code === 'auth/unauthorized-domain') {
-        errorMessage = "This domain is not authorized for Google sign-in. Please contact support.";
-        console.error('Unauthorized domain. Current domain:', window.location.hostname);
-        console.error('Add this domain to Firebase Console: Authentication > Settings > Authorized domains');
-      }
-      
-      toast({
-        title: "Sign In Failed",
-        description: errorMessage,
-        variant: "destructive"
-      });
+      console.error('Google sign-in hook error:', error);
+      setLoading(false);
+      throw error;
     }
   };
 
-  const handleAppleSignIn = async () => {
+  const signInApple = async () => {
     try {
-      dispatch(setLoading(true));
-      console.log('Starting Apple sign-in...');
+      console.log('Initiating Apple sign-in...');
+      setLoading(true);
       const result = await signInWithApple();
-      console.log('Apple sign-in successful:', result);
-      // Auth state change will be handled by the listener above
+      console.log('Apple sign-in hook completed successfully');
+      // User registration will be handled automatically by onAuthStateChanged
+      return result;
     } catch (error: any) {
-      dispatch(setLoading(false));
-      console.error('Apple sign in error:', error);
-      
-      let errorMessage = "Failed to sign in with Apple. Please try again.";
-      
-      if (error.code === 'auth/popup-closed-by-user') {
-        errorMessage = "Sign-in was cancelled.";
-      } else if (error.code === 'auth/popup-blocked') {
-        errorMessage = "Popup was blocked. Please allow popups and try again.";
-      } else if (error.code === 'auth/cancelled-popup-request') {
-        errorMessage = "Another sign-in popup is already open.";
-      } else if (error.code === 'auth/unauthorized-domain') {
-        errorMessage = "This domain is not authorized for Apple sign-in. Please contact support.";
-        console.error('Unauthorized domain. Current domain:', window.location.hostname);
-      }
-      
-      toast({
-        title: "Apple Sign In Failed",
-        description: errorMessage,
-        variant: "destructive"
-      });
+      console.error('Apple sign-in hook error:', error);
+      setLoading(false);
+      throw error;
     }
   };
 
-  const handleSignOut = async () => {
+  const signOut = async () => {
     try {
       await signOutUser();
-      // Auth state change will be handled by the listener above
-      toast({
-        title: "Signed Out",
-        description: "You have been signed out successfully."
-      });
+      dispatch(clearUser());
     } catch (error) {
       console.error('Sign out error:', error);
-      toast({
-        title: "Sign Out Failed",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive"
-      });
+      throw error;
     }
   };
 
   return {
-    signInWithGoogle: handleGoogleSignIn,
-    signInWithApple: handleAppleSignIn,
-    signOut: handleSignOut
+    user,
+    loading,
+    signInGoogle,
+    signInApple,
+    signOut,
   };
 };

@@ -29,6 +29,10 @@ api.interceptors.request.use(
 // Response interceptor to handle auth errors
 api.interceptors.response.use(
   (response) => {
+    // Check if response has data property (for admin API responses)
+    if (response.data && response.data.success !== undefined) {
+      return response.data.data || response.data;
+    }
     return response.data;
   },
   (error) => {

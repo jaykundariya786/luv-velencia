@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import {
   ArrowLeft,
   Plus,
@@ -22,7 +22,7 @@ import {
 import { useState } from "react";
 
 export default function Appointments() {
-  const navigate = useNavigate();
+  const [location, setLocation] = useLocation();
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [appointments, setAppointments] = useState([
     {
@@ -137,7 +137,7 @@ export default function Appointments() {
         </div>
 
         <Button
-          onClick={() => navigate("/account")}
+          onClick={() => setLocation("/account")}
           variant="ghost"
           size="sm"
           className="p-2"

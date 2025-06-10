@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { setLoading, loginSuccess, loginFailure } from '@/store/slices/authSlice';
+import { setLoading, loginSuccess, loginFailure, logout } from '@/store/slices/authSlice';
 import { useFirebaseAuth } from '@/hooks/use-firebase-auth';
 import { useToast } from '@/hooks/use-toast';
 

@@ -1,4 +1,3 @@
-
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ["class"],
@@ -45,11 +44,11 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         chart: {
-          "1": "hsl(var(--chart-1))",
-          "2": "hsl(var(--chart-2))",
-          "3": "hsl(var(--chart-3))",
-          "4": "hsl(var(--chart-4))",
-          "5": "hsl(var(--chart-5))",
+          1: "hsl(var(--chart-1))",
+          2: "hsl(var(--chart-2))",
+          3: "hsl(var(--chart-3))",
+          4: "hsl(var(--chart-4))",
+          5: "hsl(var(--chart-5))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -61,47 +60,6 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Enhanced Admin Color Palette
-        admin: {
-          sidebar: "hsl(var(--admin-sidebar))",
-          sidebarHover: "hsl(var(--admin-sidebar-hover))",
-          primary: "hsl(var(--admin-primary))",
-          secondary: "hsl(var(--admin-secondary))",
-          accent: "hsl(var(--admin-accent))",
-          success: "hsl(var(--admin-success))",
-          warning: "hsl(var(--admin-warning))",
-          error: "hsl(var(--admin-error))",
-          info: "hsl(var(--admin-info))",
-        },
-        // Modern emerald palette
-        emerald: {
-          50: "#ecfdf5",
-          100: "#d1fae5",
-          200: "#a7f3d0",
-          300: "#6ee7b7",
-          400: "#34d399",
-          500: "#10b981",
-          600: "#059669",
-          700: "#047857",
-          800: "#065f46",
-          900: "#064e3b",
-        },
-        // Enhanced gradient colors
-        gradient: {
-          emerald: "linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)",
-          teal: "linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #0f766e 100%)",
-          premium: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)",
-          gold: "linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)",
-        },
-      },
-      fontFamily: {
-        sans: ["Helvetica Neue", "Inter", "system-ui", "sans-serif"],
-        serif: ["Times New Roman", "serif"],
-        mono: ["Menlo", "Monaco", "Consolas", "monospace"],
-        futura: ["Futura", "sans-serif"],
-        montserrat: ["Montserrat", "sans-serif"],
-        helvetica: ["Helvetica Neue", "Arial", "sans-serif"],
-        times: ["Times New Roman", "serif"],
       },
       keyframes: {
         "accordion-down": {
@@ -140,11 +98,11 @@ export default {
           "80%": { transform: "scale3d(0.97, 0.97, 0.97)" },
           "100%": { opacity: "1", transform: "scale3d(1, 1, 1)" },
         },
-        "float": {
+        float: {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-10px)" },
         },
-        "shimmer": {
+        shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
@@ -156,23 +114,28 @@ export default {
         "fade-in-up": "fade-in-up 0.8s ease-out forwards",
         "slide-in": "slide-in 0.6s ease-out forwards",
         "bounce-in": "bounce-in 0.8s ease-out forwards",
-        "float": "float 3s ease-in-out infinite",
-        "shimmer": "shimmer 2s infinite",
+        float: "float 3s ease-in-out infinite",
+        shimmer: "shimmer 2s infinite",
       },
       boxShadow: {
-        'modern': '0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05)',
-        'luxury': '0 20px 40px rgba(16, 185, 129, 0.15), 0 8px 20px rgba(0, 0, 0, 0.1)',
-        'luxury-hover': '0 25px 50px rgba(16, 185, 129, 0.25), 0 10px 30px rgba(0, 0, 0, 0.15)',
-        'premium': '0 25px 50px rgba(139, 92, 246, 0.2), 0 10px 25px rgba(0, 0, 0, 0.1)',
-        'gold': '0 8px 25px rgba(245, 158, 11, 0.3), 0 4px 15px rgba(0, 0, 0, 0.1)',
-        'gold-hover': '0 12px 35px rgba(245, 158, 11, 0.4), 0 6px 20px rgba(0, 0, 0, 0.15)',
-        'glass': '0 8px 32px rgba(31, 38, 135, 0.37)',
-        'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        '3xl': '0 35px 60px -12px rgba(0, 0, 0, 0.3)',
+        modern:
+          "0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05)",
+        luxury:
+          "0 20px 40px rgba(16, 185, 129, 0.15), 0 8px 20px rgba(0, 0, 0, 0.1)",
+        "luxury-hover":
+          "0 25px 50px rgba(16, 185, 129, 0.25), 0 10px 30px rgba(0, 0, 0, 0.15)",
+        premium:
+          "0 25px 50px rgba(139, 92, 246, 0.2), 0 10px 25px rgba(0, 0, 0, 0.1)",
+        gold: "0 8px 25px rgba(245, 158, 11, 0.3), 0 4px 15px rgba(0, 0, 0, 0.1)",
+        "gold-hover":
+          "0 12px 35px rgba(245, 158, 11, 0.4), 0 6px 20px rgba(0, 0, 0, 0.15)",
+        glass: "0 8px 32px rgba(31, 38, 135, 0.37)",
+        xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+        "2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        "3xl": "0 35px 60px -12px rgba(0, 0, 0, 0.3)",
       },
       backdropBlur: {
-        xs: '2px',
+        xs: "2px",
       },
     },
   },

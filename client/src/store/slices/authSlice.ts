@@ -101,4 +101,8 @@ export const {
 // Export login action for header component
 export const login = loginSuccess;
 
+// Export aliases for compatibility
+export const setUser = loginSuccess;
+export const clearUser = logout;
+
 export default authSlice.reducer;

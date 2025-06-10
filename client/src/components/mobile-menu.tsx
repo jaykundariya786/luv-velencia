@@ -1,6 +1,6 @@
 import { X, Search, User, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { useAppSelector } from "@/hooks/redux";
 
 interface MobileMenuProps {
@@ -11,7 +11,7 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, onClose, onSearchToggle, onShoppingBagOpen }: MobileMenuProps) {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const { items } = useAppSelector((state) => state.shoppingBag);
   const { user } = useAppSelector((state) => state.auth);
   
@@ -21,9 +21,9 @@ export default function MobileMenu({ isOpen, onClose, onSearchToggle, onShopping
 
   const handleAccountClick = () => {
     if (user) {
-      navigate("/account");
+      setLocation("/account");
     } else {
-      navigate("/sign-in");
+      setLocation("/sign-in");
     }
     onClose();
   };
