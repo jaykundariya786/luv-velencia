@@ -25,29 +25,8 @@ const getInitialItems = (): ShoppingBagItem[] => {
     console.error("Error loading shopping bag from localStorage:", error);
   }
 
-  // Return default items if nothing in localStorage
-  return [
-    {
-      id: 1,
-      name: "WASHED DENIM SHIRT WITH GG INSERT",
-      price: 2250,
-      image:
-        "https://media.gucci.com/style/White_South_0_160_316x316/1731082815/815642_XDDCC_1130_001_100_0000_Light-Slim-fit-denim-pant-with-logo-detail.jpg",
-      size: "50 IT",
-      quantity: 1,
-      color: "Blue",
-    },
-    {
-      id: 2,
-      name: "MEN'S GUCCI RE-WEB SNEAKER",
-      price: 1150,
-      image:
-        "https://media.gucci.com/style/White_South_0_160_316x316/1742322704/832461_AAEW3_9045_001_100_0000_Light-Mens-Gucci-Re-Motion-sneaker.jpg",
-      size: "9 US",
-      quantity: 1,
-      color: "White",
-    },
-  ];
+  // Return empty array if nothing in localStorage
+  return [];
 };
 
 const initialState: ShoppingBagState = {

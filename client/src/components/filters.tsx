@@ -23,7 +23,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
     queryKey: ['filter-data'],
     queryFn: async () => {
       try {
-        const response = await fetch('/api/products');
+        const response = await fetch('/lv-api/products');
         if (!response.ok) {
           throw new Error('Failed to fetch products');
         }
@@ -136,7 +136,7 @@ export default function Filters({ filters, onFiltersChange }: FiltersProps) {
   const handleFilterChange = (key: string, value: string) => {
     const newFilters = {
       ...filters,
-      [key]: value === "all" ? undefined : value,
+      [key]: value === "all" ? undefined : value.toLowerCase(),
     };
     onFiltersChange(newFilters);
     setOpenDropdown(null);

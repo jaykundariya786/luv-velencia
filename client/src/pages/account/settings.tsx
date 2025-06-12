@@ -37,7 +37,9 @@ export default function AccountSettings() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const profileData = await getUserProfile(user?.id); // Assuming you have user id
+        if (!user?.id) return;
+        
+        const profileData = await getUserProfile(user.id);
         setProfile({
           title: profileData.title || "",
           firstName: profileData.firstName || "",
@@ -66,7 +68,12 @@ export default function AccountSettings() {
 
   const handleSave = async () => {
     try {
-      await updateUserProfile(user?.id, profile); // Assuming you have user id
+      if (!user?.id) {
+        console.error("User ID not available");
+        return;
+      }
+      
+      await updateUserProfile(user.id, profile);
       console.log("Profile updated successfully!");
     } catch (error) {
       console.error("Failed to update profile:", error);

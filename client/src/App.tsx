@@ -30,6 +30,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { store } from "./store";
 import SubscriptionPlans from './pages/subscription-plans';
 import SubscriptionCheckout from './pages/subscription-checkout';
+import Checkout from './pages/checkout';
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,7 @@ function App() {
                 <Route path="/terms-of-use" element={<TermsOfUse />} />
                 <Route path="/subscription-plans" element={<SubscriptionPlans />} />
                 <Route path="/subscription-checkout" element={<SubscriptionCheckout />} />
+                <Route path="/checkout" element={<Checkout />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

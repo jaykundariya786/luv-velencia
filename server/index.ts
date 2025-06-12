@@ -52,6 +52,14 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Start LV Backend process
+  import('./backend-launcher.js').then(({ startLVBackend }) => {
+    console.log("Starting LV Backend server...");
+    startLVBackend();
+  }).catch(err => {
+    console.log("LV Backend not available, using mock data");
+  });
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

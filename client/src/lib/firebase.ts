@@ -3,23 +3,24 @@ import { initializeApp } from "firebase/app";
 import { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyChtnbeqROM3ApgQGfmmBAS259rqloSQOc",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "brand-f7182.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "brand-f7182",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "brand-f7182.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "965093408272",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:965093408272:web:3a60ebfd5e33f7aeb7d495",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-PD6CWX49KS"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Debug logging in development
-if (import.meta.env.DEV) {
-  console.log('Firebase Config:', {
-    ...firebaseConfig,
-    apiKey: firebaseConfig.apiKey ? '***' : 'MISSING'
-  });
-  console.log('Current domain:', window.location.hostname);
-}
+console.log('Firebase Config Debug:', {
+  apiKey: firebaseConfig.apiKey ? `${firebaseConfig.apiKey.substring(0, 10)}...` : 'MISSING',
+  authDomain: firebaseConfig.authDomain,
+  projectId: firebaseConfig.projectId,
+  fullConfig: firebaseConfig
+});
+console.log('Current domain:', window.location.hostname);
+console.log('Current URL:', window.location.href);
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -48,6 +49,8 @@ appleProvider.addScope('name');
 export const signInWithGoogle = async () => {
   try {
     console.log('Starting Google sign-in...');
+    console.log('Auth domain check:', firebaseConfig.authDomain);
+    console.log('Current origin:', window.location.origin);
     
     // Clear any existing auth state
     if (auth.currentUser) {

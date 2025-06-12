@@ -1,17 +1,17 @@
-
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { discountsAPI, couponsAPI } from '../../services/api';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import discountsAPI from "../../services/api";
+import couponsAPI from "../../services/api";
 
 interface Discount {
   id: string;
   name: string;
   description: string;
-  type: 'percentage' | 'fixed_amount';
+  type: "percentage" | "fixed_amount";
   value: number;
   startDate: string;
   endDate: string;
   isActive: boolean;
-  applicationType: 'product' | 'category' | 'global';
+  applicationType: "product" | "category" | "global";
   targetProductIds?: string[];
   targetCategories?: string[];
   minOrderAmount?: number;
@@ -62,116 +62,140 @@ const initialState: DiscountsState = {
 
 // Async thunks for discounts
 export const fetchDiscounts = createAsyncThunk(
-  'discounts/fetchDiscounts',
+  "discounts/fetchDiscounts",
   async (params?: any, { rejectWithValue }) => {
     try {
       const response = await discountsAPI.getDiscounts(params);
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch discounts');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch discounts"
+      );
     }
   }
 );
 
 export const fetchDiscount = createAsyncThunk(
-  'discounts/fetchDiscount',
+  "discounts/fetchDiscount",
   async (id: string, { rejectWithValue }) => {
     try {
       const response = await discountsAPI.getDiscount(id);
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch discount');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch discount"
+      );
     }
   }
 );
 
 export const createDiscount = createAsyncThunk(
-  'discounts/createDiscount',
+  "discounts/createDiscount",
   async (data: Partial<Discount>, { rejectWithValue }) => {
     try {
       const response = await discountsAPI.createDiscount(data);
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to create discount');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to create discount"
+      );
     }
   }
 );
 
 export const updateDiscount = createAsyncThunk(
-  'discounts/updateDiscount',
-  async ({ id, data }: { id: string; data: Partial<Discount> }, { rejectWithValue }) => {
+  "discounts/updateDiscount",
+  async (
+    { id, data }: { id: string; data: Partial<Discount> },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await discountsAPI.updateDiscount(id, data);
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update discount');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update discount"
+      );
     }
   }
 );
 
 export const deleteDiscount = createAsyncThunk(
-  'discounts/deleteDiscount',
+  "discounts/deleteDiscount",
   async (id: string, { rejectWithValue }) => {
     try {
       await discountsAPI.deleteDiscount(id);
       return id;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to delete discount');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete discount"
+      );
     }
   }
 );
 
 // Async thunks for coupons
 export const fetchCoupons = createAsyncThunk(
-  'discounts/fetchCoupons',
+  "discounts/fetchCoupons",
   async (params?: any, { rejectWithValue }) => {
     try {
       const response = await couponsAPI.getCoupons(params);
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch coupons');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch coupons"
+      );
     }
   }
 );
 
 export const createCoupon = createAsyncThunk(
-  'discounts/createCoupon',
+  "discounts/createCoupon",
   async (data: Partial<Coupon>, { rejectWithValue }) => {
     try {
       const response = await couponsAPI.createCoupon(data);
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to create coupon');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to create coupon"
+      );
     }
   }
 );
 
 export const updateCoupon = createAsyncThunk(
-  'discounts/updateCoupon',
-  async ({ id, data }: { id: string; data: Partial<Coupon> }, { rejectWithValue }) => {
+  "discounts/updateCoupon",
+  async (
+    { id, data }: { id: string; data: Partial<Coupon> },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await couponsAPI.updateCoupon(id, data);
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update coupon');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update coupon"
+      );
     }
   }
 );
 
 export const deleteCoupon = createAsyncThunk(
-  'discounts/deleteCoupon',
+  "discounts/deleteCoupon",
   async (id: string, { rejectWithValue }) => {
     try {
       await couponsAPI.deleteCoupon(id);
       return id;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to delete coupon');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete coupon"
+      );
     }
   }
 );
 
 const discountsSlice = createSlice({
-  name: 'discounts',
+  name: "discounts",
   initialState,
   reducers: {
     clearError: (state) => {
@@ -216,14 +240,18 @@ const discountsSlice = createSlice({
       // Update Discount
       .addCase(updateDiscount.fulfilled, (state, action) => {
         state.currentDiscount = action.payload;
-        const index = state.discounts.findIndex(discount => discount.id === action.payload.id);
+        const index = state.discounts.findIndex(
+          (discount) => discount.id === action.payload.id
+        );
         if (index !== -1) {
           state.discounts[index] = action.payload;
         }
       })
       // Delete Discount
       .addCase(deleteDiscount.fulfilled, (state, action) => {
-        state.discounts = state.discounts.filter(discount => discount.id !== action.payload);
+        state.discounts = state.discounts.filter(
+          (discount) => discount.id !== action.payload
+        );
         state.totalDiscounts -= 1;
       })
       // Fetch Coupons
@@ -238,18 +266,27 @@ const discountsSlice = createSlice({
       })
       // Update Coupon
       .addCase(updateCoupon.fulfilled, (state, action) => {
-        const index = state.coupons.findIndex(coupon => coupon.id === action.payload.id);
+        const index = state.coupons.findIndex(
+          (coupon) => coupon.id === action.payload.id
+        );
         if (index !== -1) {
           state.coupons[index] = action.payload;
         }
       })
       // Delete Coupon
       .addCase(deleteCoupon.fulfilled, (state, action) => {
-        state.coupons = state.coupons.filter(coupon => coupon.id !== action.payload);
+        state.coupons = state.coupons.filter(
+          (coupon) => coupon.id !== action.payload
+        );
         state.totalCoupons -= 1;
       });
   },
 });
 
-export const { clearError, setCurrentPage, clearCurrentDiscount, clearCurrentCoupon } = discountsSlice.actions;
+export const {
+  clearError,
+  setCurrentPage,
+  clearCurrentDiscount,
+  clearCurrentCoupon,
+} = discountsSlice.actions;
 export default discountsSlice.reducer;

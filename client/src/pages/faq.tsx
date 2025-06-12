@@ -109,17 +109,19 @@ export default function FAQ() {
                   className="w-full text-left flex justify-between items-center py-4 hover:bg-gray-50 rounded-lg px-4 transition-all duration-300"
                 >
                   <span className="lv-luxury font-bold text-primary text-lg">{faq.question}</span>
-                  {openItems.includes(index) ? (
-                    <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
-                  )}
+                  <ChevronDown className={`w-5 h-5 text-gray-500 flex-shrink-0 transition-transform duration-300 ${
+                    openItems.includes(index) ? 'rotate-180' : 'rotate-0'
+                  }`} />
                 </button>
-                {openItems.includes(index) && (
-                  <div className="px-4 pb-4">
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  openItems.includes(index) 
+                    ? 'max-h-96 opacity-100' 
+                    : 'max-h-0 opacity-0'
+                }`}>
+                  <div className="px-4 pb-4 transform transition-transform duration-300">
                     <p className="lv-body text-gray-500 font-mono lv-transition">{faq.answer}</p>
                   </div>
-                )}
+                </div>
               </div>
             ))}
           </div>

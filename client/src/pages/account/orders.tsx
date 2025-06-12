@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Package, Calendar, Truck, CheckCircle, Clock, MapPin, RotateCcw, Eye, Download, Star } from "lucide-react";
 import { useState, useEffect } from "react";
-import { getUserOrders } from "@/services/api";
+import { ordersAPI } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Orders() {
@@ -15,9 +15,9 @@ export default function Orders() {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      if (user) {
+      if (user?.id) {
         try {
-          const ordersData = await getUserOrders(user.id);
+          const ordersData = await ordersAPI.getUserOrders(user.id);
           setOrders(ordersData);
         } catch (error) {
           console.error("Error fetching orders:", error);
@@ -33,7 +33,7 @@ export default function Orders() {
           description: "Please log in to view your orders.",
           variant: "destructive",
         });
-        navigate("/login");
+        navigate("/sign-in");
       }
     };
 

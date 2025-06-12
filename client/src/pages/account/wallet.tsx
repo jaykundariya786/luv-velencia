@@ -10,31 +10,34 @@ import {
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, CreditCard, Trash2, Shield, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAppSelector } from "@/hooks/redux";
+import { getUserPaymentMethods, addUserPaymentMethod, deleteUserPaymentMethod, updateUserPaymentMethod } from "@/services/api";
 
 export default function Wallet() {
   const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.auth);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [paymentMethods, setPaymentMethods] = useState([
-    {
-      id: 1,
-      type: "Visa",
-      lastFour: "4242",
-      expiryMonth: "12",
-      expiryYear: "2025",
-      holderName: "John Doe",
-      isDefault: true,
-    },
-    {
-      id: 2,
-      type: "Mastercard",
-      lastFour: "8888",
-      expiryMonth: "08",
-      expiryYear: "2026",
-      holderName: "John Doe",
-      isDefault: false,
-    },
-  ]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        setLoading(true);
+        if (user?.id) {
+          const methods = await getUserPaymentMethods(user.id);
+          setPaymentMethods(methods);
+        }
+      } catch (error) {
+        console.error("Failed to fetch payment methods:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, [user?.id]);
 
   const [newCard, setNewCard] = useState({
     cardNumber: "",
@@ -55,56 +58,82 @@ export default function Wallet() {
     return icons[type as keyof typeof icons] || "💳";
   };
 
-  const handleAddCard = () => {
+  const handleAddCard = async () => {
     if (
       newCard.cardNumber &&
       newCard.expiryMonth &&
       newCard.expiryYear &&
       newCard.cvv &&
-      newCard.holderName
+      newCard.holderName &&
+      user?.id
     ) {
-      let cardType = "Visa";
-      if (newCard.cardNumber.startsWith("5")) cardType = "Mastercard";
-      if (newCard.cardNumber.startsWith("3")) cardType = "American Express";
-      if (newCard.cardNumber.startsWith("6")) cardType = "Discover";
+      try {
+        let cardType = "Visa";
+        if (newCard.cardNumber.startsWith("5")) cardType = "Mastercard";
+        if (newCard.cardNumber.startsWith("3")) cardType = "American Express";
+        if (newCard.cardNumber.startsWith("6")) cardType = "Discover";
 
-      const card = {
-        id: Date.now(),
-        type: cardType,
-        lastFour: newCard.cardNumber.slice(-4),
-        expiryMonth: newCard.expiryMonth,
-        expiryYear: newCard.expiryYear,
-        holderName: newCard.holderName,
-        isDefault: paymentMethods.length === 0,
-      };
-      setPaymentMethods([...paymentMethods, card]);
-      setNewCard({
-        cardNumber: "",
-        expiryMonth: "",
-        expiryYear: "",
-        cvv: "",
-        holderName: "",
-        type: "",
-      });
-      setShowAddForm(false);
+        const cardData = {
+          type: cardType,
+          lastFour: newCard.cardNumber.slice(-4),
+          expiryMonth: newCard.expiryMonth,
+          expiryYear: newCard.expiryYear,
+          holderName: newCard.holderName,
+          isDefault: paymentMethods.length === 0,
+        };
+        
+        const result = await addUserPaymentMethod(user.id, cardData);
+        if (result.success) {
+          const methods = await getUserPaymentMethods(user.id);
+          setPaymentMethods(methods);
+        }
+        
+        setNewCard({
+          cardNumber: "",
+          expiryMonth: "",
+          expiryYear: "",
+          cvv: "",
+          holderName: "",
+          type: "",
+        });
+        setShowAddForm(false);
+      } catch (error) {
+        console.error("Failed to add payment method:", error);
+      }
     }
   };
 
-  const handleDeleteCard = (id: number) => {
+  const handleDeleteCard = async (id: number) => {
     if (
-      window.confirm("Are you sure you want to delete this payment method?")
+      window.confirm("Are you sure you want to delete this payment method?") &&
+      user?.id
     ) {
-      setPaymentMethods(paymentMethods.filter((card) => card.id !== id));
+      try {
+        await deleteUserPaymentMethod(user.id, id);
+        setPaymentMethods(paymentMethods.filter((card) => card.id !== id));
+      } catch (error) {
+        console.error("Failed to delete payment method:", error);
+      }
     }
   };
 
-  const setDefaultCard = (id: number) => {
-    setPaymentMethods(
-      paymentMethods.map((card) => ({
-        ...card,
-        isDefault: card.id === id,
-      }))
-    );
+  const setDefaultCard = async (id: number) => {
+    try {
+      if (user?.id) {
+        const cardToUpdate = paymentMethods.find(card => card.id === id);
+        if (cardToUpdate) {
+          await updateUserPaymentMethod(user.id, id, { ...cardToUpdate, isDefault: true });
+          setPaymentMethods(
+            paymentMethods.map((card) => ({
+              ...card,
+              isDefault: card.id === id,
+            }))
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Failed to set default payment method:", error);
+    }
   };
 
   return (

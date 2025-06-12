@@ -1,68 +1,106 @@
-
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Check, Crown, Sparkles, Star, ArrowLeft, Gift, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, Crown, Star, Sparkles, Shield, Gift } from "lucide-react";
 
 export default function SubscriptionPlans() {
   const navigate = useNavigate();
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
-  const plans = [
+  // Fetch subscription plans from admin
+  const { data: plansData, isLoading } = useQuery({
+    queryKey: ['subscription-plans'],
+    queryFn: async () => {
+      const response = await fetch('/api/subscription-plans');
+      if (!response.ok) {
+        throw new Error('Failed to fetch subscription plans');
+      }
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  const defaultPlans = [
     {
-      name: "Silver",
-      price: 29,
-      icon: <Star className="w-8 h-8 text-gray-500" />,
-      color: "border-gray-300",
-      bgColor: "bg-gradient-to-br from-gray-50 to-gray-100",
-      buttonColor: "bg-gray-600 hover:bg-gray-700",
+      id: "basic",
+      name: "Basic",
+      price: "$29",
+      period: "per month",
+      description: "Perfect for casual fashion enthusiasts",
       features: [
-        "10% discount on all purchases",
-        "Early access to sales",
-        "Free standard shipping",
-        "Birthday surprise gift",
-        "Exclusive newsletter content",
-        "Basic styling tips"
-      ]
+        "Access to basic collection",
+        "Monthly style newsletter",
+        "Standard customer support",
+        "Basic size guide access",
+        "Community forum access",
+      ],
+      icon: <Star className="w-6 h-6" />,
+      popular: false,
+      gradient: "from-gray-50 to-gray-100",
+      buttonStyle: "bg-gray-900 hover:bg-gray-800 text-white",
     },
     {
-      name: "Gold",
-      price: 59,
-      icon: <Crown className="w-8 h-8 text-yellow-600" />,
-      color: "border-yellow-400",
-      bgColor: "bg-gradient-to-br from-yellow-50 to-yellow-100",
-      buttonColor: "bg-yellow-600 hover:bg-yellow-700",
+      id: "premium",
+      name: "Premium",
+      price: "$59",
+      period: "per month",
+      description: "Ideal for fashion-forward individuals",
+      features: [
+        "Access to premium & basic collections",
+        "Weekly style insights",
+        "Priority customer support",
+        "Personal style consultation",
+        "Exclusive member events",
+        "Early access to new arrivals",
+        "Free shipping on all orders",
+      ],
+      icon: <Crown className="w-6 h-6" />,
       popular: true,
-      features: [
-        "20% discount on all purchases",
-        "Priority early access to new collections",
-        "Free express shipping",
-        "Complimentary gift wrapping",
-        "Personal styling consultation (1 per month)",
-        "Exclusive member-only events",
-        "Special birthday collection access",
-        "Returns extended to 45 days"
-      ]
+      gradient: "from-primary/5 to-primary/10",
+      buttonStyle: "bg-primary hover:bg-primary/90 text-white",
     },
     {
-      name: "Exclusive",
-      price: 99,
-      icon: <Sparkles className="w-8 h-8 text-purple-600" />,
-      color: "border-purple-400",
-      bgColor: "bg-gradient-to-br from-purple-50 to-purple-100",
-      buttonColor: "bg-purple-600 hover:bg-purple-700",
+      id: "luxury",
+      name: "Luxury Elite",
+      price: "$99",
+      period: "per month",
+      description: "Ultimate luxury fashion experience",
       features: [
-        "30% discount on all purchases",
-        "First access to limited edition pieces",
-        "Free overnight shipping",
+        "Access to all collections including exclusive",
+        "Daily fashion insights & trends",
+        "Dedicated personal stylist",
+        "VIP customer support",
         "Complimentary alterations",
-        "Unlimited personal styling consultations",
-        "VIP shopping appointments",
-        "Exclusive design previews",
-        "Custom wardrobe curation",
-        "60-day return window",
-        "Concierge customer service"
-      ]
-    }
+        "Exclusive luxury events & shows",
+        "White-glove delivery service",
+        "Personal shopping appointments",
+        "Custom wardrobe planning",
+      ],
+      icon: <Sparkles className="w-6 h-6" />,
+      popular: false,
+      gradient: "from-amber-50 to-yellow-50",
+      buttonStyle: "bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white",
+    },
   ];
+
+  const plans = plansData?.plans || defaultPlans;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-[#197149]/20 border-t-[#197149] rounded-full animate-spin mx-auto"></div>
+            <Sparkles className="w-6 h-6 text-[#197149] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+          </div>
+          <p className="text-lg font-medium text-gray-700 animate-pulse">
+            Loading subscription plans...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white font-['Helvetica_Neue',Arial,sans-serif]">
@@ -108,7 +146,8 @@ export default function SubscriptionPlans() {
           </h2>
           <div className="w-16 h-px bg-black mx-auto mb-12"></div>
           <p className="text-gray-600 lv-body text-lg max-w-2xl mx-auto">
-            Unlock exclusive benefits and elevate your LUV VENCENCIA experience with our premium membership tiers.
+            Unlock exclusive benefits and elevate your LUV VENCENCIA experience
+            with our premium membership tiers.
           </p>
         </div>
 
@@ -117,13 +156,15 @@ export default function SubscriptionPlans() {
           {plans.map((plan, index) => (
             <div
               key={plan.name}
-              className={`relative border-2 rounded-3xl p-8 ${plan.color} ${plan.bgColor} hover:shadow-lg transition-all duration-300 ${
-                plan.popular ? 'transform scale-105' : ''
+              className={`relative border-2 rounded-3xl p-8 ${plan.color} ${
+                plan.bgColor
+              } hover:shadow-lg transition-all duration-300 ${
+                plan.popular ? "transform scale-105" : ""
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-black text-white px-6 py-2 rounded-full text-sm lv-luxury font-bold">
+                  <span className="bg-black text-white px-4 py-2 rounded-full text-sm lv-luxury font-bold">
                     MOST POPULAR
                   </span>
                 </div>
@@ -142,7 +183,9 @@ export default function SubscriptionPlans() {
                   <span className="text-4xl lv-luxury font-bold text-black">
                     ${plan.price}
                   </span>
-                  <span className="text-gray-500 lv-body font-mono text-sm">/month</span>
+                  <span className="text-gray-500 lv-body font-mono text-sm">
+                    /month
+                  </span>
                 </div>
                 <div className="w-8 h-px bg-black mx-auto"></div>
               </div>
@@ -163,7 +206,9 @@ export default function SubscriptionPlans() {
               <Button
                 onClick={() => {
                   const { icon, ...planData } = plan;
-                  navigate('/subscription-checkout', { state: { plan: planData } });
+                  navigate("/subscription-checkout", {
+                    state: { plan: planData },
+                  });
                 }}
                 className={`w-full py-3 px-6 rounded-full text-white lv-luxury font-bold transition-all duration-300 hover:scale-105 ${plan.buttonColor}`}
               >
@@ -181,35 +226,44 @@ export default function SubscriptionPlans() {
             </h2>
             <div className="w-12 h-px bg-black mx-auto"></div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-[#0b3e27] to-[#197149] rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Gift className="w-8 h-8 text-white" />
               </div>
-              <h3 className="lv-luxury font-bold text-primary text-lg mb-4">EXCLUSIVE PERKS</h3>
+              <h3 className="lv-luxury font-bold text-primary text-lg mb-4">
+                EXCLUSIVE PERKS
+              </h3>
               <p className="text-gray-600 lv-body font-mono text-sm">
-                Enjoy member-only discounts, early access to sales, and special birthday surprises
+                Enjoy member-only discounts, early access to sales, and special
+                birthday surprises
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-[#0b3e27] to-[#197149] rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Shield className="w-8 h-8 text-white" />
               </div>
-              <h3 className="lv-luxury font-bold text-primary text-lg mb-4">PREMIUM SERVICE</h3>
+              <h3 className="lv-luxury font-bold text-primary text-lg mb-4">
+                PREMIUM SERVICE
+              </h3>
               <p className="text-gray-600 lv-body font-mono text-sm">
-                Access to personal styling, priority customer service, and complimentary services
+                Access to personal styling, priority customer service, and
+                complimentary services
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-[#0b3e27] to-[#197149] rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Crown className="w-8 h-8 text-white" />
               </div>
-              <h3 className="lv-luxury font-bold text-primary text-lg mb-4">VIP ACCESS</h3>
+              <h3 className="lv-luxury font-bold text-primary text-lg mb-4">
+                VIP ACCESS
+              </h3>
               <p className="text-gray-600 lv-body font-mono text-sm">
-                First access to new collections, exclusive events, and limited edition pieces
+                First access to new collections, exclusive events, and limited
+                edition pieces
               </p>
             </div>
           </div>
@@ -223,7 +277,7 @@ export default function SubscriptionPlans() {
             </h2>
             <div className="w-12 h-px bg-black mx-auto"></div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div className="border-l-4 border-[#197149] pl-6">
@@ -231,36 +285,42 @@ export default function SubscriptionPlans() {
                   Can I cancel my subscription anytime?
                 </h3>
                 <p className="text-gray-600 lv-body font-mono text-sm">
-                  Yes, you can cancel your subscription at any time. Your benefits will continue until the end of your current billing period.
+                  Yes, you can cancel your subscription at any time. Your
+                  benefits will continue until the end of your current billing
+                  period.
                 </p>
               </div>
-              
+
               <div className="border-l-4 border-[#197149] pl-6">
                 <h3 className="lv-luxury font-bold text-primary text-lg mb-3">
                   Can I upgrade or downgrade my plan?
                 </h3>
                 <p className="text-gray-600 lv-body font-mono text-sm">
-                  Yes, you can change your plan at any time. Changes will take effect at your next billing cycle.
+                  Yes, you can change your plan at any time. Changes will take
+                  effect at your next billing cycle.
                 </p>
               </div>
             </div>
-            
+
             <div className="space-y-6">
               <div className="border-l-4 border-[#197149] pl-6">
                 <h3 className="lv-luxury font-bold text-primary text-lg mb-3">
                   Do discounts apply to sale items?
                 </h3>
                 <p className="text-gray-600 lv-body font-mono text-sm">
-                  Member discounts apply to regular-priced items. Some exclusions may apply to limited edition and heavily discounted items.
+                  Member discounts apply to regular-priced items. Some
+                  exclusions may apply to limited edition and heavily discounted
+                  items.
                 </p>
               </div>
-              
+
               <div className="border-l-4 border-[#197149] pl-6">
                 <h3 className="lv-luxury font-bold text-primary text-lg mb-3">
                   Are there any setup fees?
                 </h3>
                 <p className="text-gray-600 lv-body font-mono text-sm">
-                  No setup fees. Just pay your monthly subscription fee and start enjoying your benefits immediately.
+                  No setup fees. Just pay your monthly subscription fee and
+                  start enjoying your benefits immediately.
                 </p>
               </div>
             </div>

@@ -1,11 +1,34 @@
-
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 export default function Contact() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch contact settings from admin
+  const { data: contactSettings } = useQuery({
+    queryKey: ['contact-settings'],
+    queryFn: async () => {
+      const response = await fetch('/api/contact-settings');
+      if (!response.ok) {
+        throw new Error('Failed to fetch contact settings');
+      }
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
   const navigate = useNavigate();
 
   return (
@@ -57,6 +80,7 @@ export default function Contact() {
         </div>
 
         {/* Contact Methods Grid */}
+        {/*
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
           <div className="border-2 border-gray-200 rounded-3xl p-8 bg-white hover:shadow-lg transition-shadow">
             <div className="flex items-center gap-4 mb-6">
@@ -117,6 +141,75 @@ export default function Contact() {
             </div>
           </div>
         </div>
+        */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div className="border-2 border-gray-200 rounded-3xl p-8 bg-white hover:shadow-lg transition-shadow">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-[#0b3e27] to-[#197149] rounded-2xl flex items-center justify-center">
+                <Mail className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl lv-luxury font-bold text-primary">EMAIL SUPPORT</h3>
+            </div>
+            <p className="text-gray-600 mb-6 lv-body">Get in touch via email for detailed inquiries</p>
+            <div className="space-y-3">
+              <p className="text-gray-600 lv-body font-mono text-sm">{contactSettings?.emailGeneral || 'support@luvvencencia.com'}</p>
+              <p className="text-gray-600 lv-body font-mono text-sm">{contactSettings?.emailOrders || 'orders@luvvencencia.com'}</p>
+              <p className="text-gray-600 lv-body font-mono text-sm">{contactSettings?.emailPress || 'press@luvvencencia.com'}</p>
+            </div>
+          </div>
+
+          <div className="border-2 border-gray-200 rounded-3xl p-8 bg-white hover:shadow-lg transition-shadow">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-[#0b3e27] to-[#197149] rounded-2xl flex items-center justify-center">
+                <Phone className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl lv-luxury font-bold text-primary">PHONE SUPPORT</h3>
+            </div>
+            <p className="text-gray-600 mb-6 lv-body">Speak directly with our customer service team</p>
+            <div className="space-y-3">
+              <p className="text-gray-600 lv-body font-mono text-sm">{contactSettings?.phoneUS || '+1 (555) 123-4567'}</p>
+              <p className="text-gray-600 lv-body font-mono text-sm">{contactSettings?.phoneInternational || '+1 (555) 987-6543'}</p>
+            </div>
+          </div>
+
+          <div className="border-2 border-gray-200 rounded-3xl p-8 bg-white hover:shadow-lg transition-shadow">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-[#0b3e27] to-[#197149] rounded-2xl flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl lv-luxury font-bold text-primary">VISIT OUR STORE</h3>
+            </div>
+            <p className="text-gray-600 mb-6 lv-body">Experience our products in person</p>
+            <div className="space-y-3">
+              <p className="text-gray-600 lv-body font-mono text-sm">{contactSettings?.addressStreet || '123 Fashion Avenue'}</p>
+              <p className="text-gray-600 lv-body font-mono text-sm">{contactSettings?.addressCity || 'New York, NY 10001'}</p>
+              <p className="text-gray-600 lv-body font-mono text-sm">{contactSettings?.addressCountry || 'United States'}</p>
+            </div>
+          </div>
+
+          <div className="border-2 border-gray-200 rounded-3xl p-8 bg-white hover:shadow-lg transition-shadow">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-[#0b3e27] to-[#197149] rounded-2xl flex items-center justify-center">
+                <Clock className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl lv-luxury font-bold text-primary">BUSINESS HOURS</h3>
+            </div>
+            <p className="text-gray-600 mb-6 lv-body">When we're available to help</p>
+            <div className="space-y-3">
+              {contactSettings?.businessHours ? (
+                contactSettings.businessHours.split('\n').map((line: string, index: number) => (
+                  <p key={index} className="text-gray-600 lv-body font-mono text-sm">{line}</p>
+                ))
+              ) : (
+                <>
+                  <p className="text-gray-600 lv-body font-mono text-sm">Monday - Friday: 9AM - 7PM EST</p>
+                  <p className="text-gray-600 lv-body font-mono text-sm">Saturday: 10AM - 6PM EST</p>
+                  <p className="text-gray-600 lv-body font-mono text-sm">Sunday: 12PM - 5PM EST</p>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
 
         {/* Contact Form Section */}
         <div className="text-center mb-16">
@@ -130,7 +223,7 @@ export default function Contact() {
           <p className="text-gray-600 mb-8 lv-body text-center">
             Have a specific question? Fill out our contact form and we'll get back to you within 24 hours.
           </p>
-          
+
           <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>

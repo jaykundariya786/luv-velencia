@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useProducts } from "@/hooks/use-products";
 import ProductCard from "@/components/product-card";
 import ProductSkeleton from "@/components/product-skeleton";
@@ -80,19 +81,173 @@ export default function SearchResults() {
     });
   };
 
-  const colors = [
-    "Black",
-    "White",
-    "Brown",
-    "Beige",
-    "Blue",
-    "Green",
-    "Red",
-    "Pink",
-    "Grey",
-    "Gold",
+  // Fetch dynamic filter data
+  const {
+    data: filterData,
+    isLoading: filterLoading,
+    error: filterError,
+  } = useQuery({
+    queryKey: ["filter-data"],
+    queryFn: async () => {
+      try {
+        const response = await fetch("/api/products");
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+        const data = await response.json();
+        const products = data.products || [];
+
+        // Calculate category counts
+        const categoryCounts = products.reduce((acc: any, product: any) => {
+          const category = product.category?.toLowerCase() || "uncategorized";
+          acc[category] = (acc[category] || 0) + 1;
+          return acc;
+        }, {});
+
+        // Calculate line counts
+        const lineCounts = products.reduce((acc: any, product: any) => {
+          const line = product.line?.toLowerCase();
+          if (line) {
+            acc[line] = (acc[line] || 0) + 1;
+          }
+          return acc;
+        }, {});
+
+        // Get unique colors - handle both string and parsed JSON
+        const uniqueColors = [
+          ...new Set(
+            products.flatMap((product: any) => {
+              let colors = product.colors;
+              if (typeof colors === "string") {
+                try {
+                  colors = JSON.parse(colors);
+                } catch {
+                  colors = [colors];
+                }
+              }
+              return Array.isArray(colors)
+                ? colors.map((color: string) => color.toLowerCase())
+                : [];
+            }),
+          ),
+        ].sort();
+
+        // Get unique materials - handle both string and parsed JSON
+        const uniqueMaterials = [
+          ...new Set(
+            products.flatMap((product: any) => {
+              let materials = product.materials;
+              if (typeof materials === "string") {
+                try {
+                  materials = JSON.parse(materials);
+                } catch {
+                  materials = [materials];
+                }
+              }
+              return Array.isArray(materials)
+                ? materials.map((material: string) => material.toLowerCase())
+                : [];
+            }),
+          ),
+        ].sort();
+
+        // If no data found, provide default categories
+        const defaultCategories = {
+          shoes: 0,
+          clothing: 0,
+          accessories: 0,
+          bags: 0,
+          jewelry: 0,
+        };
+
+        const defaultLines = {
+          premium: 0,
+          classic: 0,
+          modern: 0,
+          luxury: 0,
+        };
+
+        const defaultColors = [
+          "black",
+          "white",
+          "brown",
+          "blue",
+          "red",
+          "green",
+          "pink",
+          "gray",
+        ];
+        const defaultMaterials = [
+          "leather",
+          "cotton",
+          "silk",
+          "wool",
+          "polyester",
+          "denim",
+        ];
+
+        return {
+          total: products.length,
+          categories:
+            Object.keys(categoryCounts).length > 0
+              ? categoryCounts
+              : defaultCategories,
+          lines: Object.keys(lineCounts).length > 0 ? lineCounts : defaultLines,
+          colors: uniqueColors.length > 0 ? uniqueColors : defaultColors,
+          materials:
+            uniqueMaterials.length > 0 ? uniqueMaterials : defaultMaterials,
+        };
+      } catch (error) {
+        console.error("Error fetching filter data:", error);
+        return {
+          total: 0,
+          categories: {
+            shoes: 0,
+            clothing: 0,
+            accessories: 0,
+            bags: 0,
+            jewelry: 0,
+          },
+          lines: {
+            premium: 0,
+            classic: 0,
+            modern: 0,
+            luxury: 0,
+          },
+          colors: [
+            "black",
+            "white",
+            "brown",
+            "blue",
+            "red",
+            "green",
+            "pink",
+            "gray",
+          ],
+          materials: [
+            "leather",
+            "cotton",
+            "silk",
+            "wool",
+            "polyester",
+            "denim",
+          ],
+        };
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  const colors = filterData?.colors || [
+    "black",
+    "white",
+    "brown",
+    "blue",
+    "red",
   ];
-  const materials = ["Leather", "GG Canvas", "Fabric", "Suede", "Canvas"];
+  const materials = filterData?.materials || ["leather", "cotton", "silk"];
+  const categories = filterData?.categories || {};
+  const lines = filterData?.lines || {};
 
   if (isLoading && !products?.length) {
     return (
@@ -221,8 +376,8 @@ export default function SearchResults() {
                     {sortOption === "newest"
                       ? "Newest"
                       : sortOption === "price-low"
-                      ? "Price: Low to High"
-                      : "Price: High to Low"}
+                        ? "Price: Low to High"
+                        : "Price: High to Low"}
                   </button>
                 ))}
               </div>
@@ -268,17 +423,21 @@ export default function SearchResults() {
               }`}
             >
               <div className="space-y-2">
-                {["all", "shoes", "bags", "clothing", "jewelry"].map(
-                  (category) => (
-                    <button
-                      key={category}
-                      onClick={() => handleFilterChange("category", category)}
-                      className="lv-body hover:text-primary font-mono lv-transition block w-full text-left py-2 text-sm text-gray-600 hover:text-black transition-colors duration-200"
-                    >
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
-                    </button>
-                  )
-                )}
+                <button
+                  onClick={() => handleFilterChange("category", "all")}
+                  className="lv-body hover:text-primary font-mono lv-transition block w-full text-left py-2 text-sm text-gray-600 hover:text-black transition-colors duration-200"
+                >
+                  All ({filterData?.total || 0})
+                </button>
+                {Object.entries(categories).map(([category, count]) => (
+                  <button
+                    key={category}
+                    onClick={() => handleFilterChange("category", category)}
+                    className="lv-body hover:text-primary font-mono lv-transition block w-full text-left py-2 text-sm text-gray-600 hover:text-black transition-colors duration-200 capitalize"
+                  >
+                    {category.replace(/-/g, " ")} ({count})
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -312,7 +471,7 @@ export default function SearchResults() {
                     <input
                       type="checkbox"
                       checked={filters.materials.includes(
-                        material.toLowerCase()
+                        material.toLowerCase(),
                       )}
                       onChange={() =>
                         handleMaterialFilter(material.toLowerCase())
@@ -469,7 +628,7 @@ export default function SearchResults() {
                     const newQuery = formData.get("mobileSearch") as string;
                     if (newQuery.trim()) {
                       navigate(
-                        `/search?q=${encodeURIComponent(newQuery.trim())}`
+                        `/search?q=${encodeURIComponent(newQuery.trim())}`,
                       );
                       setShowMobileFilters(false);
                     }
@@ -493,20 +652,29 @@ export default function SearchResults() {
                     Category
                   </h3>
                   <div className="space-y-2">
-                    {["All", "Shoes", "Bags", "Clothing", "Jewelry"].map(
-                      (cat, index) => (
+                    <button
+                      onClick={() => {
+                        handleFilterChange("category", "all");
+                        setShowMobileFilters(false);
+                      }}
+                      className="lv-body text-gray-500 hover:text-primary font-mono lv-transition block w-full text-left py-3 px-4 text-sm rounded-full hover:bg-primary/5 transition-all duration-200 border border-gray-100"
+                    >
+                      All ({filterData?.total || 0})
+                    </button>
+                    {Object.entries(categories).map(
+                      ([category, count], index) => (
                         <button
-                          key={cat}
+                          key={category}
                           onClick={() => {
-                            handleFilterChange("category", cat.toLowerCase());
+                            handleFilterChange("category", category);
                             setShowMobileFilters(false);
                           }}
-                          className="lv-body text-gray-500 hover:text-primary font-mono lv-transition block w-full text-left py-3 px-4 text-sm rounded-full hover:bg-primary/5 transition-all duration-200 border border-gray-100 animate-in fade-in slide-in-from-bottom-2"
-                          style={{ animationDelay: `${index * 100}ms` }}
+                          className="lv-body text-gray-500 hover:text-primary font-mono lv-transition block w-full text-left py-3 px-4 text-sm rounded-full hover:bg-primary/5 transition-all duration-200 border border-gray-100 animate-in fade-in slide-in-from-bottom-2 capitalize"
+                          style={{ animationDelay: `${(index + 1) * 100}ms` }}
                         >
-                          {cat}
+                          {category.replace(/-/g, " ")} ({count})
                         </button>
-                      )
+                      ),
                     )}
                   </div>
                 </div>
@@ -528,7 +696,7 @@ export default function SearchResults() {
                               checked={
                                 filterType === "materials"
                                   ? filters.materials.includes(
-                                      item.toLowerCase()
+                                      item.toLowerCase(),
                                     )
                                   : filters.colors.includes(item.toLowerCase())
                               }
@@ -543,7 +711,7 @@ export default function SearchResults() {
                               {item}
                             </span>
                           </label>
-                        )
+                        ),
                       )}
                     </div>
                   </div>

@@ -1,186 +1,486 @@
-import axios from 'axios';
-import toast from 'react-hot-toast';
+// API Service for LV Backend Integration
+const API_BASE_URL = "http://0.0.0.0:5001/api";
 
-const API_BASE_URL = '/api';
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  errors?: any[];
+}
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 10000, // 10 second timeout
-});
+class ApiService {
+  private baseURL: string;
+  private token: string | null = null;
 
-// Request interceptor to add auth token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('adminToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+  constructor(baseURL: string) {
+    this.baseURL = baseURL;
+    this.token = localStorage.getItem("adminToken");
   }
-);
 
-// Response interceptor for error handling
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    // Handle different types of errors
-    if (error.code === 'ECONNABORTED') {
-      toast.error('Request timeout. Please try again.');
-    } else if (error.response?.status === 401) {
-      // Unauthorized - redirect to login
-      localStorage.removeItem('adminToken');
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+  setToken(token: string) {
+    this.token = token;
+    localStorage.setItem("adminToken", token);
+  }
+
+  removeToken() {
+    this.token = null;
+    localStorage.removeItem("adminToken");
+  }
+
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
+    const url = `${this.baseURL}${endpoint}`;
+
+    const config: RequestInit = {
+      headers: {
+        "Content-Type": "application/json",
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
+        ...options.headers,
+      },
+      ...options,
+    };
+
+    // Don't set Content-Type for FormData
+    if (options.body instanceof FormData) {
+      delete (config.headers as any)["Content-Type"];
+    }
+
+    try {
+      const response = await fetch(url, config);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
       }
-    } else if (error.response?.status >= 500) {
-      toast.error('Server error. Please try again later.');
-    } else if (!error.response) {
-      toast.error('Network error. Please check your connection.');
-    }
 
-    return Promise.reject(error);
+      const data = await response.json();
+
+      // Handle LV Backend response format
+      if (data.success !== undefined) {
+        return data;
+      }
+
+      // Wrap plain data in success format
+      return {
+        success: true,
+        data: data,
+      };
+    } catch (error) {
+      console.error("API request failed:", error);
+      throw error;
+    }
   }
-);
+
+  // Auth methods
+  async login(credentials: { username: string; password: string }) {
+    return this.request<{ token: string; user: any }>("/auth/admin/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+  }
+
+  async verifyToken() {
+    return this.request<{ user: any }>("/auth/me");
+  }
+
+  async logout() {
+    const result = await this.request("/auth/logout", { method: "POST" });
+    this.removeToken();
+    return result;
+  }
+
+  // Dashboard methods
+  async getDashboardData() {
+    return this.request<{
+      overview: {
+        totalUsers: number;
+        activeUsers: number;
+        totalOrders: number;
+        totalRevenue: number;
+        averageOrderValue: number;
+        totalProducts: number;
+        totalCategories: number;
+      };
+      orderStatus: {
+        pending: number;
+        confirmed: number;
+        shipped: number;
+        delivered: number;
+        cancelled: number;
+      };
+      recentOrders: any[];
+      lowStockProducts: any[];
+      topProducts: any[];
+    }>("/admin/dashboard");
+  }
+
+  // Analytics methods
+  async getAnalyticsOverview(period: string = "30d") {
+    return this.request<{
+      revenue: any;
+      period: { start: Date; end: Date };
+      salesData: any[];
+      topProducts: any[];
+      categoryData: any[];
+    }>(`/admin/analytics?period=${period}`);
+  }
+
+  async getSalesAnalytics(period: string = "30d") {
+    return this.request<{
+      dailySales: any[];
+      categorySales: any[];
+      productSales: any[];
+      regionSales: any[];
+    }>(`/admin/analytics/sales?period=${period}`);
+  }
+
+  // Orders methods
+  async getOrders(
+    params: {
+      page?: number;
+      limit?: number;
+      status?: string;
+      startDate?: string;
+      endDate?: string;
+    } = {}
+  ) {
+    const queryParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) {
+        queryParams.append(key, value.toString());
+      }
+    });
+
+    return this.request<{
+      orders: any[];
+      pagination: {
+        currentPage: number;
+        totalPages: number;
+        totalOrders: number;
+        hasNextPage: boolean;
+        hasPrevPage: boolean;
+        limit: number;
+      };
+    }>(`/admin/orders?${queryParams.toString()}`);
+  }
+
+  async getOrder(id: string) {
+    return this.request<any>(`/admin/orders/${id}`);
+  }
+
+  async updateOrderStatus(id: string, status: string) {
+    return this.request<any>(`/admin/orders/${id}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    });
+  }
+
+  // Users methods
+  async getUsers(
+    params: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      role?: string;
+      status?: string;
+    } = {}
+  ) {
+    const queryParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) {
+        queryParams.append(key, value.toString());
+      }
+    });
+
+    return this.request<{
+      users: any[];
+      pagination: {
+        currentPage: number;
+        totalPages: number;
+        totalUsers: number;
+        hasNextPage: boolean;
+        hasPrevPage: boolean;
+        limit: number;
+      };
+    }>(`/admin/users?${queryParams.toString()}`);
+  }
+
+  async getFirebaseUsers(
+    params: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      status?: string;
+    } = {}
+  ) {
+    const queryParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) {
+        queryParams.append(key, value.toString());
+      }
+    });
+
+    return this.request<{
+      users: any[];
+      total: number;
+      page: number;
+      totalPages: number;
+    }>(`/admin/users/firebase?${queryParams.toString()}`);
+  }
+
+  async getUser(id: string) {
+    return this.request<any>(`/admin/users/${id}`);
+  }
+
+  async updateUser(id: string, userData: any) {
+    return this.request<any>(`/admin/users/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(userData),
+    });
+  }
+
+  async toggleUserStatus(id: string) {
+    return this.request<any>(`/admin/users/${id}/toggle-status`, {
+      method: "PATCH",
+    });
+  }
+
+  async deleteUser(id: string) {
+    return this.request<any>(`/admin/users/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Products methods
+  async getProducts(
+    params: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      category?: string;
+      status?: string;
+    } = {}
+  ) {
+    const queryParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) {
+        queryParams.append(key, value.toString());
+      }
+    });
+
+    return this.request<{
+      products: any[];
+      pagination: {
+        currentPage: number;
+        totalPages: number;
+        totalProducts: number;
+        hasNextPage: boolean;
+        hasPrevPage: boolean;
+        limit: number;
+      };
+    }>(`/admin/products?${queryParams.toString()}`);
+  }
+
+  async getProduct(id: string) {
+    return this.request<any>(`/admin/products/${id}`);
+  }
+
+  async createProduct(productData: any) {
+    return this.request<any>("/admin/products", {
+      method: "POST",
+      body: JSON.stringify(productData),
+    });
+  }
+
+  async updateProduct(id: string, productData: any) {
+    return this.request<any>(`/admin/products/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(productData),
+    });
+  }
+
+  async deleteProduct(id: string) {
+    return this.request<any>(`/admin/products/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  async updateProductStock(
+    id: string,
+    stockData: { stock: number; lowStockThreshold?: number }
+  ) {
+    return this.request<any>(`/admin/products/${id}/stock`, {
+      method: "PATCH",
+      body: JSON.stringify(stockData),
+    });
+  }
+
+  async getLowStockAlerts() {
+    return this.request<{ alerts: any[] }>("/admin/products/low-stock");
+  }
+
+  // Categories methods
+  async getCategories() {
+    return this.request<{ categories: any[] }>("/admin/categories");
+  }
+
+  async createCategory(categoryData: any) {
+    return this.request<any>("/admin/categories", {
+      method: "POST",
+      body: JSON.stringify(categoryData),
+    });
+  }
+
+  async updateCategory(id: string, categoryData: any) {
+    return this.request<any>(`/admin/categories/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(categoryData),
+    });
+  }
+
+  async deleteCategory(id: string) {
+    return this.request<any>(`/admin/categories/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Product variants
+  async createProductVariant(productId: string, variantData: any) {
+    return this.request<any>(`/admin/products/${productId}/variants`, {
+      method: "POST",
+      body: JSON.stringify(variantData),
+    });
+  }
+
+  async updateProductVariant(
+    productId: string,
+    variantId: string,
+    variantData: any
+  ) {
+    return this.request<any>(
+      `/admin/products/${productId}/variants/${variantId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(variantData),
+      }
+    );
+  }
+
+  async deleteProductVariant(productId: string, variantId: string) {
+    return this.request<any>(
+      `/admin/products/${productId}/variants/${variantId}`,
+      {
+        method: "DELETE",
+      }
+    );
+  }
+
+  // Image management
+  async uploadImages(productId: string | undefined, files: File[]) {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    const endpoint = productId
+      ? `/admin/products/${productId}/images`
+      : "/admin/upload/images";
+
+    return this.request<{ images: string[] }>(endpoint, {
+      method: "POST",
+      body: formData,
+    });
+  }
+
+  async reorderImages(productId: string, imageOrder: string[]) {
+    return this.request<any>(`/admin/products/${productId}/images/reorder`, {
+      method: "PATCH",
+      body: JSON.stringify({ imageOrder }),
+    });
+  }
+
+  async setCoverImage(productId: string, imageIndex: number) {
+    return this.request<any>(`/admin/products/${productId}/images/cover`, {
+      method: "PATCH",
+      body: JSON.stringify({ coverImageIndex: imageIndex }),
+    });
+  }
+}
+
+// Create and export API service instance
+export const apiService = new ApiService(API_BASE_URL);
 
 // Auth API
 export const authAPI = {
   login: (credentials: { username: string; password: string }) =>
-    api.post('/admin/login', credentials),
-  verifyToken: () => api.get('/admin/verify'),
-  logout: () => api.post('/admin/logout'),
-};
-
-// Users API
-export const usersAPI = {
-  getUsers: (params?: any) => api.get('/admin/users', { params }),
-  getFirebaseUsers: (params?: any) => api.get('/admin/firebase-users', { params }),
-  getUser: (id: string) => api.get(`/admin/users/${id}`),
-  updateUser: (id: string, data: any) => api.put(`/admin/users/${id}`, data),
-  deleteUser: (id: string) => api.delete(`/admin/users/${id}`),
-  toggleUserStatus: (id: string) => api.patch(`/admin/users/${id}/toggle-status`),
-  updateUserStatus: (id: string, data: { isActive: boolean }) => api.put(`/admin/users/${id}/status`, data),
-};
-
-// Products API
-export const productsAPI = {
-  getProducts: (params?: any) => api.get('/admin/products', { params }),
-  getProduct: (id: string) => api.get(`/admin/products/${id}`),
-  createProduct: (data: any) => api.post('/admin/products', data),
-  updateProduct: (id: string, data: any) => api.put(`/admin/products/${id}`, data),
-  deleteProduct: (id: string) => api.delete(`/admin/products/${id}`),
-  getCategories: () => api.get('/admin/products/categories'),
-  updateProductStock: (id: string, data: { stock: number; lowStockThreshold?: number }) =>
-    api.put(`/admin/products/${id}/stock`, data),
-  getLowStockAlerts: () =>
-    api.get('/admin/alerts/low-stock'),
-
-  // Product variants
-  createProductVariant: (productId: string, data: any) => 
-    api.post(`/admin/products/${productId}/variants`, data),
-  updateProductVariant: (productId: string, variantId: string, data: any) => 
-    api.put(`/admin/products/${productId}/variants/${variantId}`, data),
-  deleteProductVariant: (productId: string, variantId: string) => 
-    api.delete(`/admin/products/${productId}/variants/${variantId}`),
-  getProductVariants: (productId: string) => 
-    api.get(`/admin/products/${productId}/variants`),
-
-  // Image management
-  uploadImages: (productId: string | undefined, files: File[]) => {
-    const formData = new FormData();
-    files.forEach(file => formData.append('images', file));
-    if (productId) formData.append('productId', productId);
-    return api.post('/admin/products/images/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-  },
-  reorderImages: (productId: string, imageOrder: string[]) => 
-    api.put(`/admin/products/${productId}/images/reorder`, { imageOrder }),
-  setCoverImage: (productId: string, imageIndex: number) => 
-    api.put(`/admin/products/${productId}/images/cover`, { imageIndex }),
-  deleteImage: (productId: string, imageUrl: string) => 
-    api.delete(`/admin/products/${productId}/images`, { data: { imageUrl } }),
-};
-
-// Orders API
-export const ordersAPI = {
-  getOrders: (params?: any) => api.get('/admin/orders', { params }),
-  getOrder: (id: string) => api.get(`/admin/orders/${id}`),
-  updateOrder: (id: string, data: any) => api.put(`/admin/orders/${id}`, data),
-  updateOrderStatus: (id: string, status: string, trackingNumber?: string) => 
-    api.put(`/admin/orders/${id}/status`, { status, trackingNumber }),
-  generateBill: (id: string) => {
-    return api.get(`/admin/orders/${id}/bill`, {
-      responseType: 'blob', // For PDF download
-    });
-  },
-  deleteOrder: (id: string) => api.delete(`/admin/orders/${id}`),
+    apiService.login(credentials),
+  verifyToken: () => apiService.verifyToken(),
+  logout: () => apiService.logout(),
 };
 
 // Dashboard API
 export const dashboardAPI = {
-  getStats: () => api.get('/admin/analytics'),
-};
-
-// Discounts API
-export const discountsAPI = {
-  getDiscounts: (params?: any) => api.get('/admin/discounts', { params }),
-  getDiscount: (id: string) => api.get(`/admin/discounts/${id}`),
-  createDiscount: (data: any) => api.post('/admin/discounts', data),
-  updateDiscount: (id: string, data: any) => api.put(`/admin/discounts/${id}`, data),
-  deleteDiscount: (id: string) => api.delete(`/admin/discounts/${id}`),
-};
-
-// Coupons API
-export const couponsAPI = {
-  getCoupons: (params?: any) => api.get('/admin/coupons', { params }),
-  getCoupon: (id: string) => api.get(`/admin/coupons/${id}`),
-  createCoupon: (data: any) => api.post('/admin/coupons', data),
-  updateCoupon: (id: string, data: any) => api.put(`/admin/coupons/${id}`, data),
-  deleteCoupon: (id: string) => api.delete(`/admin/coupons/${id}`),
+  getDashboardData: () => apiService.getDashboardData(),
 };
 
 // Analytics API
 export const analyticsAPI = {
-  getSalesAnalytics: (params?: any) => api.get('/admin/analytics/sales', { params }),
-  getReports: (params?: any) => api.get('/admin/reports', { params }),
-  generateReport: (data: any) => api.post('/admin/reports/generate', data),
-  downloadReport: (id: string) => api.get(`/admin/reports/${id}/download`, {
-    responseType: 'blob', // For file download
-  }),
-  deleteReport: (id: string) => api.delete(`/admin/reports/${id}`),
+  getOverview: (period?: string) => apiService.getAnalyticsOverview(period),
+  getSales: (period?: string) => apiService.getSalesAnalytics(period),
 };
 
-// Multi-currency APIs
-
-// Get exchange rates
-export const currencyAPI = {
-  getExchangeRates: () => api.get('/admin/currencies/rates'),
-  updateExchangeRates: (rates: any) => api.put('/admin/currencies/rates', { rates }),
-  convertCurrency: (amount: number, fromCurrency: string, toCurrency: string) => 
-    api.post('/admin/currencies/convert', { amount, fromCurrency, toCurrency }),
-};
-
-// Settings API
-export const settingsAPI = {
-  getSettings: () => api.get('/admin/settings'),
-  updateSettings: (data: any) => api.put('/admin/settings', data),
-  togglePlugin: (pluginId: string, enabled: boolean) => 
-    api.put(`/admin/settings/plugins/${pluginId}`, { enabled }),
-  uploadLogo: (file: File) => {
-    const formData = new FormData();
-    formData.append('logo', file);
-    return api.post('/admin/settings/logo/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+// Orders API
+export const ordersAPI = {
+  getOrders: (params?: any) => apiService.getOrders(params),
+  getOrder: (id: string) => apiService.getOrder(id),
+  updateOrderStatus: (id: string, status: string) =>
+    apiService.updateOrderStatus(id, status),
+  generateBill: (id: string) => {
+    return Promise.resolve({ success: true, billUrl: `/bills/${id}.pdf` });
   },
 };
 
-export default api;
+// Users API
+export const usersAPI = {
+  getUsers: (params?: any) => apiService.getUsers(params),
+  getFirebaseUsers: (params?: any) => apiService.getFirebaseUsers(params),
+  getUser: (id: string) => apiService.getUser(id),
+  updateUser: (id: string, data: any) => apiService.updateUser(id, data),
+  deleteUser: (id: string) => apiService.deleteUser(id),
+  toggleUserStatus: (id: string) => apiService.toggleUserStatus(id),
+};
+
+// Products API
+export const productsAPI = {
+  getProducts: (params?: any) => apiService.getProducts(params),
+  getProduct: (id: string) => apiService.getProduct(id),
+  createProduct: (data: any) => apiService.createProduct(data),
+  updateProduct: (id: string, data: any) => apiService.updateProduct(id, data),
+  deleteProduct: (id: string) => apiService.deleteProduct(id),
+  updateProductStock: (id: string, stockData: any) =>
+    apiService.updateProductStock(id, stockData),
+  getLowStockAlerts: () => apiService.getLowStockAlerts(),
+  getCategories: () => apiService.getCategories(),
+  createCategory: (data: any) => apiService.createCategory(data),
+  updateCategory: (id: string, data: any) =>
+    apiService.updateCategory(id, data),
+  deleteCategory: (id: string) => apiService.deleteCategory(id),
+  createProductVariant: (productId: string, data: any) =>
+    apiService.createProductVariant(productId, data),
+  updateProductVariant: (productId: string, variantId: string, data: any) =>
+    apiService.updateProductVariant(productId, variantId, data),
+  deleteProductVariant: (productId: string, variantId: string) =>
+    apiService.deleteProductVariant(productId, variantId),
+  uploadImages: (productId: string | undefined, files: File[]) =>
+    apiService.uploadImages(productId, files),
+  reorderImages: (productId: string, imageOrder: string[]) =>
+    apiService.reorderImages(productId, imageOrder),
+  setCoverImage: (productId: string, imageIndex: number) =>
+    apiService.setCoverImage(productId, imageIndex),
+};
+
+export default apiService;

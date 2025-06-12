@@ -25,8 +25,7 @@ import {
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { getDocuments, createDocument, updateDocument, deleteDocument } from '../lib/firebase';
-import { useAppSelector } from '../hooks/redux';
+import { usersAPI } from '../services/api';
 
 interface UserData {
   id: string;
@@ -55,156 +54,55 @@ const Users: React.FC = () => {
   const [pageSize] = useState(10);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const loadUsers = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Check if user is authenticated before loading data
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        setError('Please log in to view users');
-        setLoading(false);
-        return;
-      }
+      // Use LV Backend API exclusively
+      const params = {
+        page: currentPage,
+        limit: pageSize,
+        ...(searchTerm && { search: searchTerm }),
+        ...(statusFilter !== 'all' && { status: statusFilter }),
+        ...(roleFilter !== 'all' && { role: roleFilter })
+      };
 
-      // Get authenticated Firebase users from backend API
-      const response = await fetch('/api/admin/firebase-users', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await usersAPI.getUsers(params);
 
-      if (response.ok) {
-        const data = await response.json();
-        const backendUsers = data.users.map((user: any) => ({
-          id: user.id,
-          name: user.name || '',
+      if (response.success && response.data) {
+        const { users: usersData, pagination } = response.data;
+
+        // Transform LV Backend user data to match our interface
+        const transformedUsers: UserData[] = usersData.map((user: any) => ({
+          id: user._id || user.id,
+          name: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name || '',
           email: user.email || '',
           phone: user.phone || '',
           role: user.role || 'customer',
           isActive: user.isActive !== undefined ? user.isActive : true,
-          avatar: user.photoURL || '',
-          joinedDate: user.createdAt || new Date().toISOString().split('T')[0],
-          lastLogin: user.lastLogin || '',
-          location: user.location || '',
+          avatar: user.profileImage?.url || user.avatar || '',
+          joinedDate: user.createdAt ? new Date(user.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          lastLogin: user.lastLogin ? new Date(user.lastLogin).toLocaleString() : '',
+          location: user.addresses?.[0] ? `${user.addresses[0].city}, ${user.addresses[0].state}` : '',
           totalOrders: user.totalOrders || 0,
           totalSpent: user.totalSpent || 0,
-          status: user.isActive ? 'active' : 'inactive',
-          provider: user.provider || 'email',
-          firebaseUID: user.firebaseUID,
-          isNewUser: user.createdAt && new Date(user.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // New if created in last 7 days
+          status: user.isActive ? 'active' : 'inactive'
         }));
-        
-        setUsers(backendUsers);
-        return;
+
+        setUsers(transformedUsers);
+        setTotalUsers(pagination.totalUsers);
+        setTotalPages(pagination.totalPages);
+      } else {
+        throw new Error(response.message || 'Failed to load users');
       }
-
-      // Fallback to Firebase directly if backend fails
-      const usersSnapshot = await getDocuments('users');
-      const firebaseUsers: UserData[] = [];
-
-      usersSnapshot.forEach((doc) => {
-        const data = doc.data();
-        firebaseUsers.push({
-          id: doc.id,
-          name: data.name || '',
-          email: data.email || '',
-          phone: data.phone || '',
-          role: data.role || 'customer',
-          isActive: data.isActive !== undefined ? data.isActive : true,
-          avatar: data.avatar || '',
-          joinedDate: data.joinedDate || data.createdAt?.toDate().toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
-          lastLogin: data.lastLogin || '',
-          location: data.location || '',
-          totalOrders: data.totalOrders || 0,
-          totalSpent: data.totalSpent || 0,
-          status: data.status || 'active',
-          provider: data.provider || 'email',
-          isNewUser: data.createdAt && data.createdAt.toDate() > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-        });
-      });
-
-      // If no users exist in Firebase, create some sample users
-      if (firebaseUsers.length === 0) {
-        const sampleUsers = [
-          {
-            name: 'Sarah Johnson',
-            email: 'sarah.johnson@email.com',
-            phone: '+1 (555) 123-4567',
-            role: 'customer' as const,
-            isActive: true,
-            avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=center',
-            joinedDate: '2024-01-15',
-            lastLogin: '2024-06-10 09:30 AM',
-            location: 'New York, NY',
-            totalOrders: 12,
-            totalSpent: 2890.50,
-            status: 'active' as const
-          },
-          {
-            name: 'Michael Chen',
-            email: 'michael.chen@email.com',
-            phone: '+1 (555) 234-5678',
-            role: 'customer' as const,
-            isActive: true,
-            avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=center',
-            joinedDate: '2024-02-20',
-            lastLogin: '2024-06-10 11:15 AM',
-            location: 'Los Angeles, CA',
-            totalOrders: 8,
-            totalSpent: 1540.25,
-            status: 'active' as const
-          },
-          {
-            name: 'Emma Davis',
-            email: 'emma.davis@email.com',
-            phone: '+1 (555) 345-6789',
-            role: 'manager' as const,
-            isActive: true,
-            avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=center',
-            joinedDate: '2023-11-10',
-            lastLogin: '2024-06-10 08:45 AM',
-            location: 'Chicago, IL',
-            totalOrders: 0,
-            totalSpent: 0,
-            status: 'active' as const
-          }
-        ];
-
-        // Create sample users in Firebase
-        for (const userData of sampleUsers) {
-          await createDocument('users', userData);
-        }
-
-        // Reload users after creating samples
-        const updatedSnapshot = await getDocuments('users');
-        firebaseUsers.length = 0; // Clear array
-        updatedSnapshot.forEach((doc) => {
-          const data = doc.data();
-          firebaseUsers.push({
-            id: doc.id,
-            name: data.name || '',
-            email: data.email || '',
-            phone: data.phone || '',
-            role: data.role || 'customer',
-            isActive: data.isActive !== undefined ? data.isActive : true,
-            avatar: data.avatar || '',
-            joinedDate: data.joinedDate || data.createdAt?.toDate().toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
-            lastLogin: data.lastLogin || '',
-            location: data.location || '',
-            totalOrders: data.totalOrders || 0,
-            totalSpent: data.totalSpent || 0,
-            status: data.status || 'active'
-          });
-        });
-      }
-
-      setUsers(firebaseUsers);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error loading users:', err);
-      setError('Failed to load users. Please try again.');
+      setError(err.message || 'Failed to load users from LV Backend. Please ensure the backend is running.');
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -213,33 +111,38 @@ const Users: React.FC = () => {
   const handleDeleteUser = async (userId: string, userName: string) => {
     if (window.confirm(`Are you sure you want to delete ${userName}?`)) {
       try {
-        await deleteDocument('users', userId);
-        await loadUsers();
-        toast.success(`${userName} has been deleted successfully`);
-      } catch (err) {
+        const response = await usersAPI.deleteUser(userId);
+        if (response.success) {
+          await loadUsers();
+          toast.success(`${userName} has been deleted successfully`);
+        } else {
+          throw new Error(response.message || 'Failed to delete user');
+        }
+      } catch (err: any) {
         console.error('Error deleting user:', err);
-        toast.error('Failed to delete user');
+        toast.error(err.message || 'Failed to delete user');
       }
     }
   };
 
   const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
     try {
-      await updateDocument('users', userId, { 
-        isActive: !currentStatus,
-        status: !currentStatus ? 'active' : 'inactive'
-      });
-      await loadUsers();
-      toast.success('User status updated successfully');
-    } catch (err) {
+      const response = await usersAPI.toggleUserStatus(userId);
+      if (response.success) {
+        await loadUsers();
+        toast.success('User status updated successfully');
+      } else {
+        throw new Error(response.message || 'Failed to update user status');
+      }
+    } catch (err: any) {
       console.error('Error updating user status:', err);
-      toast.error('Failed to update user status');
+      toast.error(err.message || 'Failed to update user status');
     }
   };
 
   useEffect(() => {
     loadUsers();
-  }, []);
+  }, [currentPage, searchTerm, statusFilter, roleFilter]);
 
   const handleSelectUser = (userId: string) => {
     setSelectedUsers(prev => 
@@ -250,27 +153,12 @@ const Users: React.FC = () => {
   };
 
   const handleSelectAll = () => {
-    if (selectedUsers.length === paginatedUsers.length) {
+    if (selectedUsers.length === users.length) {
       setSelectedUsers([]);
     } else {
-      setSelectedUsers(paginatedUsers.map(user => user.id));
+      setSelectedUsers(users.map(user => user.id));
     }
   };
-
-  // Filter users based on search term and filters
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-
-    return matchesSearch && matchesStatus && matchesRole;
-  });
-
-  // Pagination
-  const totalPages = Math.ceil(filteredUsers.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + pageSize);
 
   const getRoleBadge = (role: string) => {
     const styles = {
@@ -346,28 +234,28 @@ const Users: React.FC = () => {
           <p className="mt-2 text-gray-600">Manage user accounts and permissions</p>
         </div>
         <div className="flex items-center space-x-3">
-            <button
-              onClick={loadUsers}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <RefreshCw className="h-4 w-4" />
-              <span>Refresh</span>
-            </button>
-            <button
-              onClick={handleExportUsers}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Download className="h-4 w-4" />
-              <span>Export CSV</span>
-            </button>
-            <button
-              onClick={() => toast.success('Add User feature coming soon!')}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Add User</span>
-            </button>
-          </div>
+          <button
+            onClick={loadUsers}
+            className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span>Refresh</span>
+          </button>
+          <button
+            onClick={handleExportUsers}
+            className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            <span>Export CSV</span>
+          </button>
+          <button
+            onClick={() => toast.success('Add User feature coming soon!')}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add User</span>
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -379,7 +267,7 @@ const Users: React.FC = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{totalUsers}</p>
             </div>
           </div>
         </div>
@@ -509,7 +397,7 @@ const Users: React.FC = () => {
                 <th className="px-6 py-3 text-left">
                   <input
                     type="checkbox"
-                    checked={selectedUsers.length === paginatedUsers.length && paginatedUsers.length > 0}
+                    checked={selectedUsers.length === users.length && users.length > 0}
                     onChange={handleSelectAll}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
@@ -538,7 +426,7 @@ const Users: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedUsers.map((user) => (
+              {users.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <input
@@ -564,29 +452,19 @@ const Users: React.FC = () => {
                         )}
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900 flex items-center">
+                        <div className="text-sm font-medium text-gray-900">
                           {user.name}
-                          {user.isNewUser && (
-                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              New
-                            </span>
-                          )}
                         </div>
                         <div className="text-sm text-gray-500 flex items-center">
                           <Mail className="h-3 w-3 mr-1" />
                           {user.email}
                         </div>
-                        <div className="text-xs text-gray-400 flex items-center mt-1">
-                          {user.provider && (
-                            <span className="mr-2 capitalize">{user.provider} login</span>
-                          )}
-                          {user.location && (
-                            <>
-                              <MapPin className="h-3 w-3 mr-1" />
-                              {user.location}
-                            </>
-                          )}
-                        </div>
+                        {user.location && (
+                          <div className="text-xs text-gray-400 flex items-center mt-1">
+                            <MapPin className="h-3 w-3 mr-1" />
+                            {user.location}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -648,7 +526,7 @@ const Users: React.FC = () => {
           <div className="bg-white px-6 py-3 border-t border-gray-200">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-700">
-                Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, filteredUsers.length)} of {filteredUsers.length} results
+                Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalUsers)} of {totalUsers} results
               </div>
               <div className="flex items-center space-x-2">
                 <button
@@ -658,19 +536,22 @@ const Users: React.FC = () => {
                 >
                   Previous
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-1 text-sm border rounded ${
-                      currentPage === page
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const page = i + 1;
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-3 py-1 text-sm border rounded ${
+                        currentPage === page
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}

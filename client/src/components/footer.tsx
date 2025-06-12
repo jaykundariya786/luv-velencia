@@ -13,36 +13,36 @@ export default function Footer() {
               Quick Links
             </h3>
             <div className="space-y-3">
-              <button
-                onClick={() => navigate('/services')}
-                className="block lv-luxury text-md font-bold text-primary hover:text-black transition-colors cursor-pointer text-left"
+              <a
+                href="/services"
+                className="lv-body text-gray-500 hover:text-primary font-mono lv-transition  block transition-colors cursor-pointer text-left"
               >
                 Services
-              </button>
-              <button
-                onClick={() => navigate('/about')}
-                className="block lv-luxury text-md font-bold text-primary hover:text-black transition-colors cursor-pointer text-left"
+              </a>
+              <a
+                href="/about"
+                className="lv-body text-gray-500 hover:text-primary font-mono lv-transition  block transition-colors cursor-pointer text-left"
               >
                 About LUV VENCENCIA
-              </button>
-              <button
-                onClick={() => navigate('/faq')}
-                className="block lv-luxury text-md font-bold text-primary hover:text-black transition-colors cursor-pointer text-left"
+              </a>
+              <a
+                href="/faq"
+                className="lv-body text-gray-500 hover:text-primary font-mono lv-transition  block transition-colors cursor-pointer text-left"
               >
                 FAQ
-              </button>
-              <button
-                onClick={() => navigate('/product-care')}
-                className="block lv-luxury text-md font-bold text-primary hover:text-black transition-colors cursor-pointer text-left"
+              </a>
+              <a
+                href="/product-care"
+                className="lv-body text-gray-500 hover:text-primary font-mono lv-transition  block transition-colors cursor-pointer text-left"
               >
                 Product Care
-              </button>
-              <button
-                onClick={() => navigate('/gift-services')}
-                className="block lv-luxury text-md font-bold text-primary hover:text-black transition-colors cursor-pointer text-left"
+              </a>
+              <a
+                href="/gift-services"
+                className="lv-body text-gray-500 hover:text-primary font-mono lv-transition  block transition-colors cursor-pointer text-left"
               >
                 Gift Services
-              </button>
+              </a>
             </div>
           </div>
 
@@ -51,25 +51,25 @@ export default function Footer() {
             <h3 className="lv-luxury mb-4 text-md font-bold text-primary">
               Customer Care
             </h3>
-            <div className="space-y-3">
-              <button
-                onClick={() => navigate('/contact')}
-                className="block lv-luxury text-md font-bold text-primary hover:text-black transition-colors cursor-pointer text-left"
+            <div className="space-y-2">
+              <a
+                href="/contact"
+                className="lv-body text-gray-500 hover:text-primary font-mono lv-transition  block transition-colors cursor-pointer text-left"
               >
                 Contact Us
-              </button>
-              <button
-                onClick={() => navigate('/size-guide')}
-                className="block lv-luxury text-md font-bold text-primary hover:text-black transition-colors cursor-pointer text-left"
+              </a>
+              <a
+                href="/size-guide"
+                className="lv-body text-gray-500 hover:text-primary font-mono lv-transition  block transition-colors cursor-pointer text-left"
               >
                 Size Guide
-              </button>
-              <button
-                onClick={() => navigate('/shipping-returns')}
-                className="block lv-luxury text-md font-bold text-primary hover:text-black transition-colors cursor-pointer text-left"
+              </a>
+              <a
+                href="/shipping-returns"
+                className="lv-body text-gray-500 hover:text-primary font-mono lv-transition  block transition-colors cursor-pointer text-left"
               >
                 Shipping & Returns
-              </button>
+              </a>
             </div>
           </div>
 
@@ -78,15 +78,12 @@ export default function Footer() {
             <h3 className="lv-luxury mb-4 text-md font-bold text-primary">
               Membership
             </h3>
-            <p className="lv-body text-gray-500 hover:text-primary font-mono lv-transition mb-4">
-              Be the first to know about new arrivals and exclusive events.
-            </p>
-            <button
-              onClick={() => navigate('/subscription-plans')}
-              className="bg-black text-white px-6 py-3 rounded-full hover:bg-gray-800 transition-colors lv-luxury text-sm font-semibold"
+            <a
+              href="/subscription-plans"
+              className="lv-body text-gray-500 hover:text-primary font-mono lv-transition mb-4"
             >
-              View Subscription Plans
-            </button>
+              Be the first to know about new arrivals and exclusive events.
+            </a>
           </div>
         </div>
 
@@ -97,24 +94,24 @@ export default function Footer() {
               © 2025 LUV VENCENCIA - All rights reserved.
             </div>
             <div className="flex flex-wrap text-xs gap-4">
-              <button
-                onClick={() => navigate('/privacy-policy')}
-                className="lv-luxury text-xs font-bold text-primary hover:text-black transition-colors cursor-pointer"
+              <a
+                href="/privacy-policy"
+                className="lv-body text-gray-500 hover:text-primary font-mono lv-transition  block transition-colors cursor-pointer text-left"
               >
                 Privacy Policy
-              </button>
-              <button
-                onClick={() => navigate('/cookie-policy')}
-                className="lv-luxury text-xs font-bold text-primary hover:text-black transition-colors cursor-pointer"
+              </a>
+              <a
+                href="/cookie-policy"
+                className="lv-body text-gray-500 hover:text-primary font-mono lv-transition  block transition-colors cursor-pointer text-left"
               >
                 Cookie Policy
-              </button>
-              <button
-                onClick={() => navigate('/terms-of-use')}
-                className="lv-luxury text-xs font-bold text-primary hover:text-black transition-colors cursor-pointer"
+              </a>
+              <a
+                href="/terms-of-use"
+                className="lv-body text-gray-500 hover:text-primary font-mono lv-transition  block transition-colors cursor-pointer text-left"
               >
                 Terms of Use
-              </button>
+              </a>
             </div>
           </div>
         </div>

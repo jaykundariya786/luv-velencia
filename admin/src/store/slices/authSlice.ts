@@ -30,7 +30,7 @@ export const login = createAsyncThunk(
   ) => {
     try {
       const response = await authAPI.login(credentials);
-      const { user, token } = response.data.data;
+      const { user, token } = response.data || response;
       localStorage.setItem("adminToken", token);
       return { user, token };
     } catch (error: any) {
@@ -50,7 +50,7 @@ export const verifyToken = createAsyncThunk(
       }
       
       const response = await authAPI.verifyToken();
-      return response.data.data;
+      return response.data?.user || response.data;
     } catch (error: any) {
       localStorage.removeItem("adminToken");
       const message = error?.response?.data?.message || "Token verification failed";

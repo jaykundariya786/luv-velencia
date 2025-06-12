@@ -162,9 +162,15 @@ export default function ShoppingBagPopup({
 
           {/* Action Buttons */}
           <div className="space-y-2 lv-luxury mb-4 text-md font-bold text-white">
-            <a className="w-full flex rounded-full items-center justify-center bg-primary hover:shadow-xl transition-all h-10 uppercase text-xs">
+            <Button
+              onClick={() => {
+                navigate("/checkout");
+                onClose();
+              }}
+              className="w-full flex rounded-full items-center justify-center bg-primary hover:shadow-xl transition-all h-10 uppercase text-xs"
+            >
               Checkout
-            </a>
+            </Button>
             <a
               onClick={() => {
                 navigate("/shopping-bag");

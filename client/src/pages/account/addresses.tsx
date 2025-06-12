@@ -61,7 +61,9 @@ export default function Addresses() {
 
   const fetchAddresses = async () => {
     try {
-      const data = await getUserAddresses();
+      if (!user?.id) return;
+      
+      const data = await getUserAddresses(user.id);
       setAddresses(data);
     } catch (error) {
       console.error("Error fetching addresses:", error);
@@ -69,13 +71,13 @@ export default function Addresses() {
   };
 
   const handleAddAddress = async () => {
-    if (newAddress.name && newAddress.street && newAddress.city) {
+    if (newAddress.name && newAddress.street && newAddress.city && user?.id) {
       try {
         const address = {
           ...newAddress,
           isDefault: addresses.length === 0,
         };
-        await addUserAddress(address);
+        await addUserAddress(user.id, address);
         setNewAddress({
           type: "",
           name: "",
@@ -97,9 +99,9 @@ export default function Addresses() {
     const addressToDelete = addresses.find((addr) => addr.id === id);
     const confirmMessage = `Are you sure you want to delete the ${addressToDelete?.type} address?\n\nThis action cannot be undone.`;
 
-    if (window.confirm(confirmMessage)) {
+    if (window.confirm(confirmMessage) && user?.id) {
       try {
-        await deleteUserAddress(id);
+        await deleteUserAddress(user.id, id);
         fetchAddresses(); // Refresh addresses after deleting
       } catch (error) {
         console.error("Error deleting address:", error);
@@ -128,10 +130,11 @@ export default function Addresses() {
       editFormData.name &&
       editFormData.street &&
       editFormData.city &&
-      editingAddress
+      editingAddress &&
+      user?.id
     ) {
       try {
-        await updateUserAddress(editingAddress, editFormData);
+        await updateUserAddress(user.id, editingAddress, editFormData);
         setEditingAddress(null);
         setEditFormData({
           type: "",

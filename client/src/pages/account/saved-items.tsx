@@ -17,8 +17,10 @@ export default function SavedItems() {
     const fetchSavedItems = async () => {
       try {
         setLoading(true);
-        const items = await getSavedItems();
-        setSavedItems(items);
+        if (user?.id) {
+          const items = await getSavedItems(user.id);
+          setSavedItems(items);
+        }
       } catch (error) {
         console.error("Failed to fetch saved items:", error);
       } finally {
@@ -27,12 +29,14 @@ export default function SavedItems() {
     };
 
     fetchSavedItems();
-  }, []);
+  }, [user?.id]);
 
   const handleRemoveItem = async (id: number) => {
     try {
-      await removeSavedItem(id);
-      setSavedItems(savedItems.filter((item) => item.id !== id));
+      if (user?.id) {
+        await removeSavedItem(user.id, id);
+        setSavedItems(savedItems.filter((item) => item.id !== id));
+      }
     } catch (error) {
       console.error("Failed to remove saved item:", error);
     }

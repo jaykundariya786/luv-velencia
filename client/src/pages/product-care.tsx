@@ -100,20 +100,20 @@ export default function ProductCare() {
         </div>
 
         {/* Care Instructions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12 md:mb-16">
           {careInstructions.map((section, index) => (
-            <div key={index} className="border-2 border-gray-200 rounded-3xl p-8 bg-white hover:shadow-luxury transition-all duration-300">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center">
+            <div key={index} className="border-2 border-gray-200 rounded-3xl p-6 md:p-8 bg-white hover:shadow-luxury transition-all duration-300">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center flex-shrink-0">
                   <section.icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl lv-luxury font-bold text-primary">{section.title}</h3>
+                <h3 className="text-lg md:text-xl lv-luxury font-bold text-primary">{section.title}</h3>
               </div>
               <ul className="space-y-3">
                 {section.items.map((item, itemIndex) => (
                   <li key={itemIndex} className="lv-body text-gray-500 font-mono text-sm lv-transition flex items-start">
                     <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    {item}
+                    <span className="break-words">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -129,12 +129,12 @@ export default function ProductCare() {
           <div className="w-16 h-px bg-black mx-auto mb-12"></div>
         </div>
 
-        <div className="border-2 border-gray-200 rounded-3xl p-8 mb-12 bg-white">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="border-2 border-gray-200 rounded-3xl p-6 md:p-8 mb-12 bg-white">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
             {fabricGuide.map((item, index) => (
-              <div key={index} className="flex justify-between items-center py-4 border-b border-gray-100 last:border-b-0">
-                <span className="lv-luxury font-bold text-primary text-lg">{item.fabric}</span>
-                <span className="lv-body text-gray-500 font-mono text-sm lv-transition">{item.care}</span>
+              <div key={index} className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 border-b border-gray-100 last:border-b-0 gap-2 sm:gap-4">
+                <span className="lv-luxury font-bold text-primary text-base md:text-lg flex-shrink-0">{item.fabric}</span>
+                <span className="lv-body text-gray-500 font-mono text-xs md:text-sm lv-transition break-words">{item.care}</span>
               </div>
             ))}
           </div>

@@ -300,24 +300,6 @@
     @apply fixed top-0 left-0 right-0 bg-white border-b border-gray-200 p-4 z-50 shadow-sm;
   }
 
-  /* Header styles */
-  .lv-header {
-    @apply bg-white sticky top-0 z-40;
-    min-height: 60px;
-  }
-
-  @media (max-width: 768px) {
-    .lv-header {
-      min-height: 56px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .lv-header {
-      min-height: 52px;
-    }
-  }
-
   /* Product grid responsive styles */
   .product-grid {
     @apply grid grid-cols-2 md:grid-cols-4;

@@ -294,7 +294,9 @@ export default function Header({
   };
 
   return (
-    <header className={`lv-header bg-primary`}>
+    <header
+      className={`sticky top-0 z-50 left-0 w-full bg-gradient-to-r from-[#0b3e27] to-[#197149]`}
+    >
       <div className=" mx-auto px-3 sm:px-8">
         <div className="flex justify-between items-center py-5">
           {/* Left Section */}
